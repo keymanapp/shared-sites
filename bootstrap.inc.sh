@@ -105,7 +105,7 @@ if [[ ! -f "$BOOTSTRAP" ]]; then
 fi
 
 # Finally, we need to run builder.inc.sh, if it hasn't already been run
-if [[ -z ${THIS_SCRIPT_PATH+x} ]]; then
+if [[ -z ${THIS_SCRIPT_PATH+x} ]] && [[ -f "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh" ]]; then
   source "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh"
 
   # Bootstrapped scripts always run from their own folder (probably $REPO_ROOT),
