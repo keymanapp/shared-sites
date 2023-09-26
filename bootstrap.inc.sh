@@ -43,7 +43,7 @@ function _bootstrap_download() {
   curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/main/$remote_file" -o "$local_file"
 }
 
-fnuction _bootstrap_echo() {
+function _bootstrap_echo() {
   echo "[bootstrap] $*"
 }
 
