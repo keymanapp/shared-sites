@@ -113,5 +113,5 @@ _bootstrap_init
 
 # Finally, we need to run builder.inc.sh, if it hasn't already been run
 if [[ -z ${THIS_SCRIPT_PATH+x} ]]; then
-  source $BOOTSTRAP_BUILDER"
+  source "$BOOTSTRAP_BUILDER"
 fi
