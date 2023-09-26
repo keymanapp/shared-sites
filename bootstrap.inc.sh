@@ -8,7 +8,7 @@ set -eu
 #    # adjust relative paths as necessary
 #    readonly THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 #    readonly BOOTSTRAP="$(dirname "$THIS_SCRIPT")/resources/bootstrap.inc.sh"
-#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/main/bootstrap.inc.sh)
+#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/main/bootstrap.inc.sh?token=$(date +%s))
 #    ## END STANDARD BUILD SCRIPT INCLUDE
 
 #
@@ -40,7 +40,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/main/$remote_file" -o "$local_file"
+  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/main/$remote_file?token=$(date +%s)" -o "$local_file"
 }
 
 function _bootstrap_echo() {
