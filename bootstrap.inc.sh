@@ -2,13 +2,18 @@
 
 set -eu
 
+# BOOTSTRAP_PUBLISH_VERSION must be updated with each release of the bootstrap
+# and must match a published tag on github.com/keymanapp/shared-sites.
+BOOTSTRAP_PUBLISH_VERSION=v0.2
+
 # BOOTSTRAP variable is defined in the standard site prolog:
 #
 #    ## START STANDARD BUILD SCRIPT INCLUDE
 #    # adjust relative paths as necessary
 #    readonly THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 #    readonly BOOTSTRAP="$(dirname "$THIS_SCRIPT")/resources/bootstrap.inc.sh"
-#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/main/bootstrap.inc.sh?token=$(date +%s))
+#    readonly BOOTSTRAP_VERSION=v0.2
+#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/bootstrap.inc.sh)
 #    ## END STANDARD BUILD SCRIPT INCLUDE
 
 #
@@ -17,6 +22,11 @@ set -eu
 
 if [[ -z ${BOOTSTRAP+x} ]]; then
   echo "FATAL: \$BOOTSTRAP must be defined according to standard site build.sh script prolog"
+  exit 2
+fi
+
+if [[ -z ${BOOTSTRAP_VERSION+x} ]]; then
+  echo "FATAL: \$BOOTSTRAP_VERSION must be defined according to standard site build.sh script prolog"
   exit 2
 fi
 
@@ -40,7 +50,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/main/$remote_file?token=$(date +%s)" -o "$local_file" || (
+  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_PUBLISH_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
@@ -102,7 +112,7 @@ function _bootstrap_configure_common() {
 }
 
 # Test if resources need to be downloaded
-if [[ ! -f "$BOOTSTRAP" ]]; then
+if [[ ! -f "$BOOTSTRAP" ]] || [[ "$BOOTSTRAP_VERSION" != "$BOOTSTRAP_PUBLISH_VERSION" ]]; then
   _bootstrap_echo "Bootstrap required"
   bootstrap_configure
 fi
