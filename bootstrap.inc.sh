@@ -74,6 +74,9 @@ function bootstrap_configure() {
   _bootstrap_echo "Bootstrap starting"
   _bootstrap_download bootstrap.inc.sh "$BOOTSTRAP"
 
+  # Record the version we downloaded -- before we re-source the script!
+  echo $BOOTSTRAP_VERSION > "$BOOTSTRAP_CURRENT_VERSION_FILE"
+
   # Load the new bootstrap before doing additional downloads. The bootstrap
   # include script has been designed to cope with being run multiple times;
   # this ensures that the latest version of _bootstrap_configure_common is
@@ -81,9 +84,6 @@ function bootstrap_configure() {
   source "$BOOTSTRAP"
 
   _bootstrap_configure_common
-
-  # Record the version we downloaded
-  echo $BOOTSTRAP_VERSION > "$BOOTSTRAP_CURRENT_VERSION_FILE"
 
   _bootstrap_echo "Bootstrap complete"
 }
