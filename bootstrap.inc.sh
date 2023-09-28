@@ -2,14 +2,16 @@
 
 set -eu
 
-# BOOTSTRAP variable is defined in the standard site prolog:
+# BOOTSTRAP variable is defined in the standard site prolog.
+# 1. Update BOOTSTRAP_VERSION to the published tag or commitish to use
+# 2. Update BOOTSTRAP path as necessary
 #
-#    ## START STANDARD BUILD SCRIPT INCLUDE
-#    # adjust relative paths as necessary
+#    ## START STANDARD SITE BUILD SCRIPT INCLUDE
 #    readonly THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 #    readonly BOOTSTRAP="$(dirname "$THIS_SCRIPT")/resources/bootstrap.inc.sh"
-#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/main/bootstrap.inc.sh?token=$(date +%s))
-#    ## END STANDARD BUILD SCRIPT INCLUDE
+#    readonly BOOTSTRAP_VERSION=v0.2
+#    [ -f "$BOOTSTRAP" ] && source "$BOOTSTRAP" || source <(curl -fs https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/bootstrap.inc.sh)
+#    ## END STANDARD SITE BUILD SCRIPT INCLUDE
 
 #
 # Sanity checks on start
@@ -17,6 +19,11 @@ set -eu
 
 if [[ -z ${BOOTSTRAP+x} ]]; then
   echo "FATAL: \$BOOTSTRAP must be defined according to standard site build.sh script prolog"
+  exit 2
+fi
+
+if [[ -z ${BOOTSTRAP_VERSION+x} ]]; then
+  echo "FATAL: \$BOOTSTRAP_VERSION must be defined according to standard site build.sh script prolog"
   exit 2
 fi
 
@@ -33,6 +40,10 @@ if [[ -z ${BOOTSTRAP_ROOT+x} ]]; then
   readonly BOOTSTRAP_ROOT="$(dirname "$BOOTSTRAP")/.."
 fi
 
+if [[ -z ${BOOTSTRAP_CURRENT_VERSION_FILE+x} ]]; then
+  readonly BOOTSTRAP_CURRENT_VERSION_FILE="$(dirname $BOOTSTRAP)/.bootstrap-version"
+fi
+
 #
 # Helper function to download a file from the shared-sites repository 'main' branch
 #
@@ -40,7 +51,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/main/$remote_file?token=$(date +%s)" -o "$local_file" || (
+  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
@@ -62,6 +73,9 @@ function _bootstrap_echo() {
 function bootstrap_configure() {
   _bootstrap_echo "Bootstrap starting"
   _bootstrap_download bootstrap.inc.sh "$BOOTSTRAP"
+
+  # Record the version we downloaded -- before we re-source the script!
+  echo $BOOTSTRAP_VERSION > "$BOOTSTRAP_CURRENT_VERSION_FILE"
 
   # Load the new bootstrap before doing additional downloads. The bootstrap
   # include script has been designed to cope with being run multiple times;
@@ -101,8 +115,25 @@ function _bootstrap_configure_common() {
   _bootstrap_echo "All _common files downloaded"
 }
 
+#
+# Check the bootstrap files against the .bootstrap-version file
+#
+function _bootstrap_new_version_requested() {
+  if [[ ! -f $BOOTSTRAP_CURRENT_VERSION_FILE ]]; then
+    # unknown version, version file doesn't exist, should rebuild
+    return 0
+  fi
+
+  if [[ "$(cat "$BOOTSTRAP_CURRENT_VERSION_FILE")" != "$BOOTSTRAP_VERSION" ]]; then
+    # version is different, should rebuild
+    return 0
+  fi
+
+  return 1
+}
+
 # Test if resources need to be downloaded
-if [[ ! -f "$BOOTSTRAP" ]]; then
+if [[ ! -f "$BOOTSTRAP" ]] || _bootstrap_new_version_requested; then
   _bootstrap_echo "Bootstrap required"
   bootstrap_configure
 fi
