@@ -64,6 +64,15 @@
       return $contents;
     }
 
+    public function overrideHost($host, $value) {
+      if(empty($this->$host)) {
+        // If there's no value set, then we must be overriding something invalid
+        die("Expected '\$this->$host' to be a valid host.");
+      }
+      $this->$host = $value;
+      $this->fixupHosts();
+    }
+
     function __construct() {
       if(isset($_SERVER['KEYMANHOSTS_TIER']) && in_array($_SERVER['KEYMANHOSTS_TIER'],
           [KeymanHosts::TIER_DEVELOPMENT, KeymanHosts::TIER_STAGING,
@@ -132,7 +141,6 @@
         $this->keymanweb_com = "http://host.docker.internal:8057";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       } else {
-        // TODO: allow override of these with e.g. KEYMANHOSTS_API_KEYMAN_COM='https://api.keyman.com';
         $this->s_keyman_com = "{$site_protocol}s.keyman.com{$site_suffix}";
         $this->api_keyman_com = "{$site_protocol}api.keyman.com{$site_suffix}";
         $this->help_keyman_com = "{$site_protocol}help.keyman.com{$site_suffix}";
@@ -142,6 +150,10 @@
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       }
 
+      $this->fixupHosts();
+    }
+
+    private function fixupHosts() {
       $this->blog_keyman_com_host = preg_replace('/^http(s)?:\/\/(.+)$/', '$2', $this->blog_keyman_com);
       $this->s_keyman_com_host  = preg_replace('/^http(s)?:\/\/(.+)$/', '$2', $this->s_keyman_com);
       $this->api_keyman_com_host = preg_replace('/^http(s)?:\/\/(.+)$/', '$2', $this->api_keyman_com);
