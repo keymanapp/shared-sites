@@ -103,5 +103,15 @@ function start_docker_container() {
     docker exec -i $CONTAINER_ID sh -c "ln -s /var/www/vendor vendor && chown -R www-data:www-data vendor"
   fi
 
+  # after starting container, we want to run an init script if it is present
+  if [ -f resources/init-container.sh ]; then
+    CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
+    if [ -z "$CONTAINER_ID" ]; then
+      builder_die "Docker container appears to have failed to start in order to run init-container.sh script"
+    fi
+
+    docker exec -i $CONTAINER_ID sh -c "./resources/init-container.sh"
+  fi
+
   builder_echo green "Listening on http://$HOST:$PORT"
 }
