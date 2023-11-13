@@ -5,11 +5,9 @@
 
   class KeymanSentry {
     static function init($dsn) {
-      $env = getenv();
-
-      if(isset($env['SERVER_NAME'])) {
+      if(isset($_SERVER['SERVER_NAME'])) {
         // running from web server
-        $host = $env['SERVER_NAME'];
+        $host = $_SERVER['SERVER_NAME'];
         if(preg_match('/\.local$/', $host))
           // If the host name is, e.g. api.keyman.com.local, then we'll assume this is a development environment
           $environment = 'development';
