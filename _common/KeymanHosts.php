@@ -74,10 +74,12 @@
     }
 
     function __construct() {
-      if(isset($_SERVER['KEYMANHOSTS_TIER']) && in_array($_SERVER['KEYMANHOSTS_TIER'],
+      $env = getenv();
+
+      if(isset($env['KEYMANHOSTS_TIER']) && in_array($env['KEYMANHOSTS_TIER'],
           [KeymanHosts::TIER_DEVELOPMENT, KeymanHosts::TIER_STAGING,
            KeymanHosts::TIER_PRODUCTION, KeymanHosts::TIER_TEST])) {
-        $this->tier = $_SERVER['KEYMANHOSTS_TIER'];
+        $this->tier = $env['KEYMANHOSTS_TIER'];
       } else if(file_exists(__DIR__ . '/../tier.txt')) {
         $this->tier = trim(file_get_contents(__DIR__ . '/../tier.txt'));
       } else {
@@ -104,8 +106,8 @@
       }
 
       // Append reverse-proxy port
-      if (isset($_SERVER['KEYMAN_COM_PROXY_PORT'])) {
-        $site_suffix .= ':'.$_SERVER['KEYMAN_COM_PROXY_PORT'];
+      if (isset($env['KEYMAN_COM_PROXY_PORT'])) {
+        $site_suffix .= ':'.$env['KEYMAN_COM_PROXY_PORT'];
       }
 
       $this->blog_keyman_com = "https://blog.keyman.com";
