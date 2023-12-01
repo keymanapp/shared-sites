@@ -24,6 +24,8 @@
       $keyman_com_host,  $keymanweb_com_host, $r_keymanweb_com_host, $blog_keyman_com_host,
       $donate_keyman_com_host, $translate_keyman_com_host, $sentry_keyman_com_host;
 
+    private $site_suffix;
+
     private $tier;
 
     private static $instance;
@@ -32,6 +34,10 @@
       if(!self::$instance)
         self::Rebuild();
       return self::$instance;
+    }
+
+    public function Site_Suffix() {
+      return $this->site_suffix;
     }
 
     public function Tier() {
@@ -90,15 +96,15 @@
       // Not all these are currently used but helps to cleanup confusion
       case KeymanHosts::TIER_PRODUCTION:
       case KeymanHosts::TIER_STAGING:
-        $site_suffix = '';
+        $this->site_suffix = '';
         $site_protocol = 'https://';
         break;
       case KeymanHosts::TIER_TEST:
-        $site_suffix = '';
+        $this->site_suffix = '';
         $site_protocol = 'http://';
         break;
       case KeymanHosts::TIER_DEVELOPMENT:
-        $site_suffix = '.localhost';
+        $this->site_suffix = '.localhost';
         $site_protocol = 'http://';
         break;
       default:
