@@ -141,7 +141,7 @@
         $this->r_keymanweb_com = "https://r.keymanweb.com";
       } else if($this->tier == KeymanHosts::TIER_DEVELOPMENT) {
         // Locally running sites via Docker need to access "host.docker.internal:[port]"
-        $this->s_keyman_com = "http://host.docker.internal:8054";
+        $this->s_keyman_com = "http://s.keyman.com.localhost"; // goes to website-local-proxy
         $this->api_keyman_com = "http://host.docker.internal:8058";
         $this->help_keyman_com = "http://host.docker.internal:8055";
         $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
