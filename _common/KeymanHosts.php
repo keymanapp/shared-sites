@@ -113,7 +113,7 @@
 
       // Append reverse-proxy port
       if (isset($env['KEYMAN_COM_PROXY_PORT'])) {
-        $site_suffix .= ':'.$env['KEYMAN_COM_PROXY_PORT'];
+        $this->site_suffix .= ':'.$env['KEYMAN_COM_PROXY_PORT'];
       }
 
       $this->blog_keyman_com = "https://blog.keyman.com";
@@ -149,12 +149,12 @@
         $this->keymanweb_com = "http://host.docker.internal:8057";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       } else {
-        $this->s_keyman_com = "{$site_protocol}s.keyman.com{$site_suffix}";
-        $this->api_keyman_com = "{$site_protocol}api.keyman.com{$site_suffix}";
-        $this->help_keyman_com = "{$site_protocol}help.keyman.com{$site_suffix}";
+        $this->s_keyman_com = "{$site_protocol}s.keyman.com{$this->site_suffix}";
+        $this->api_keyman_com = "{$site_protocol}api.keyman.com{$this->site_suffix}";
+        $this->help_keyman_com = "{$site_protocol}help.keyman.com{$this->site_suffix}";
         $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
-        $this->keyman_com = "{$site_protocol}keyman.com{$site_suffix}";
-        $this->keymanweb_com = "{$site_protocol}keymanweb.com{$site_suffix}";
+        $this->keyman_com = "{$site_protocol}keyman.com{$this->site_suffix}";
+        $this->keymanweb_com = "{$site_protocol}keymanweb.com{$this->site_suffix}";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       }
 
