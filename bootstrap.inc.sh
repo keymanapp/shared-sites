@@ -100,6 +100,7 @@ function _bootstrap_configure_common() {
     JsonApiFailure.php
     KeymanHosts.php
     KeymanSentry.php
+    KeymanSiteEnvironment.php
     MarkdownHost.php
   )
   local common_file=
