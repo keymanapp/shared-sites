@@ -21,7 +21,7 @@
     }
 
     public static function IsSet($name) {
-      if (isset(self::$instance->$name) && self::$instance->$name != '') {
+      if (isset(self::$instance->$name) && !is_null(self::$instance->$name)) {
         return true;
       }
       return false;
