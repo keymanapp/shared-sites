@@ -19,4 +19,11 @@
       $props = get_class_vars($class);
       var_dump($props);
     }
+
+    public static function IsSet($name) {
+      if (isset(self::$instance->$name) && self::$instance->$name != '') {
+        return true;
+      }
+      return false;
+    }
   }
