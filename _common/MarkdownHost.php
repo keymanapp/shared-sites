@@ -6,10 +6,14 @@
   use Keyman\Site\Common\KeymanHosts;
 
   class MarkdownHost {
-    private $content, $pagetitle;
+    private $content, $pagetitle, $showMenu;
 
     function PageTitle() {
       return $this->pagetitle;
+    }
+
+    function ShowMenu() {
+      return $this->showMenu;
     }
 
     function Content() {
@@ -18,6 +22,7 @@
 
     function __construct($file) {
       $this->pagetitle = 'TODO'; // If page title is not set, this hints to the developer to fix it
+      $this->showMenu = true;
 
       $file = realpath(__DIR__ . '/../') . DIRECTORY_SEPARATOR . $file;
       $contents = trim(file_get_contents($file));
@@ -31,10 +36,11 @@
       // and `---` must be the first three characters of the file (no BOM!); note that
       // the full spec supports metadata sections anywhere but we only support top-of-file.
       //
-      // Currently we support only the 'title' and 'redirect' keywords.
+      // Currently we support only the 'title', 'redirect', 'showmenu' keywords.
       //
       // title: must be a plain text title
       // redirect: must be a relative or absolute url
+      // showmenu: true or false
       //
       // ---
       // keyword: content
@@ -68,6 +74,7 @@
       }
 
       $this->pagetitle = isset($headers['title']) ? $headers['title'] : 'Untitled';
+      $this->showMenu = isset($headers['showmenu']) ? $headers['showmenu'] == 'true' : true;
 
       // Performs the parsing + prettification of Markdown for display through PHP.
       $Parsedown = new \ParsedownExtra();
