@@ -86,10 +86,17 @@ function start_docker_container() {
     SITE_HTML="$(pwd):/var/www/html/"
   fi
 
+  ADD_HOST=
+  if [[ $OSTYPE =~ linux-gnu ]]; then
+    # Linux needs --add-host parameter
+    ADD_HOST="--add-host host.docker.internal:host-gateway"
+  fi
+
   docker run --rm -d -p $PORT:80 -v ${SITE_HTML} \
     -e S_KEYMAN_COM=localhost:$PORT_S_KEYMAN_COM \
     -e API_KEYMAN_COM=localhost:$PORT_API_KEYMAN_COM \
     --name $CONTAINER_DESC \
+    ${ADD_HOST} \
     $CONTAINER_NAME
 
   # Skip if link already exists
@@ -101,6 +108,16 @@ function start_docker_container() {
     fi
 
     docker exec -i $CONTAINER_ID sh -c "ln -s /var/www/vendor vendor && chown -R www-data:www-data vendor"
+  fi
+
+  # after starting container, we want to run an init script if it is present
+  if [ -f resources/init-container.sh ]; then
+    CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
+    if [ -z "$CONTAINER_ID" ]; then
+      builder_die "Docker container appears to have failed to start in order to run init-container.sh script"
+    fi
+
+    docker exec -i $CONTAINER_ID sh -c "./resources/init-container.sh"
   fi
 
   builder_echo green "Listening on http://$HOST:$PORT"

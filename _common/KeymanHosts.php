@@ -24,6 +24,8 @@
       $keyman_com_host,  $keymanweb_com_host, $r_keymanweb_com_host, $blog_keyman_com_host,
       $donate_keyman_com_host, $translate_keyman_com_host, $sentry_keyman_com_host;
 
+    private $site_suffix;
+
     private $tier;
 
     private static $instance;
@@ -32,6 +34,10 @@
       if(!self::$instance)
         self::Rebuild();
       return self::$instance;
+    }
+
+    public function Site_Suffix() {
+      return $this->site_suffix;
     }
 
     public function Tier() {
@@ -74,10 +80,12 @@
     }
 
     function __construct() {
-      if(isset($_SERVER['KEYMANHOSTS_TIER']) && in_array($_SERVER['KEYMANHOSTS_TIER'],
+      $env = getenv();
+
+      if(isset($env['KEYMANHOSTS_TIER']) && in_array($env['KEYMANHOSTS_TIER'],
           [KeymanHosts::TIER_DEVELOPMENT, KeymanHosts::TIER_STAGING,
            KeymanHosts::TIER_PRODUCTION, KeymanHosts::TIER_TEST])) {
-        $this->tier = $_SERVER['KEYMANHOSTS_TIER'];
+        $this->tier = $env['KEYMANHOSTS_TIER'];
       } else if(file_exists(__DIR__ . '/../tier.txt')) {
         $this->tier = trim(file_get_contents(__DIR__ . '/../tier.txt'));
       } else {
@@ -88,15 +96,15 @@
       // Not all these are currently used but helps to cleanup confusion
       case KeymanHosts::TIER_PRODUCTION:
       case KeymanHosts::TIER_STAGING:
-        $site_suffix = '';
+        $this->site_suffix = '';
         $site_protocol = 'https://';
         break;
       case KeymanHosts::TIER_TEST:
-        $site_suffix = '';
+        $this->site_suffix = '';
         $site_protocol = 'http://';
         break;
       case KeymanHosts::TIER_DEVELOPMENT:
-        $site_suffix = '.localhost';
+        $this->site_suffix = '.localhost';
         $site_protocol = 'http://';
         break;
       default:
@@ -104,8 +112,8 @@
       }
 
       // Append reverse-proxy port
-      if (isset($_SERVER['KEYMAN_COM_PROXY_PORT'])) {
-        $site_suffix .= ':'.$_SERVER['KEYMAN_COM_PROXY_PORT'];
+      if (isset($env['KEYMAN_COM_PROXY_PORT'])) {
+        $this->site_suffix .= ':'.$env['KEYMAN_COM_PROXY_PORT'];
       }
 
       $this->blog_keyman_com = "https://blog.keyman.com";
@@ -133,7 +141,7 @@
         $this->r_keymanweb_com = "https://r.keymanweb.com";
       } else if($this->tier == KeymanHosts::TIER_DEVELOPMENT) {
         // Locally running sites via Docker need to access "host.docker.internal:[port]"
-        $this->s_keyman_com = "http://host.docker.internal:8054";
+        $this->s_keyman_com = "http://s.keyman.com.localhost"; // goes to website-local-proxy
         $this->api_keyman_com = "http://host.docker.internal:8058";
         $this->help_keyman_com = "http://host.docker.internal:8055";
         $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
@@ -141,12 +149,12 @@
         $this->keymanweb_com = "http://host.docker.internal:8057";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       } else {
-        $this->s_keyman_com = "{$site_protocol}s.keyman.com{$site_suffix}";
-        $this->api_keyman_com = "{$site_protocol}api.keyman.com{$site_suffix}";
-        $this->help_keyman_com = "{$site_protocol}help.keyman.com{$site_suffix}";
+        $this->s_keyman_com = "{$site_protocol}s.keyman.com{$this->site_suffix}";
+        $this->api_keyman_com = "{$site_protocol}api.keyman.com{$this->site_suffix}";
+        $this->help_keyman_com = "{$site_protocol}help.keyman.com{$this->site_suffix}";
         $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
-        $this->keyman_com = "{$site_protocol}keyman.com{$site_suffix}";
-        $this->keymanweb_com = "{$site_protocol}keymanweb.com{$site_suffix}";
+        $this->keyman_com = "{$site_protocol}keyman.com{$this->site_suffix}";
+        $this->keymanweb_com = "{$site_protocol}keymanweb.com{$this->site_suffix}";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       }
 

@@ -6,4 +6,5 @@ if [[ -z ${PORT_KEYMAN_COM+x} ]]; then
   readonly PORT_HELP_KEYMAN_COM=8055
   readonly PORT_KEYMANWEB_COM=8057
   readonly PORT_API_KEYMAN_COM=8058
+  readonly PORT_API_KEYMAN_COM_DB=8059
 fi
