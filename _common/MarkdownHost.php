@@ -52,25 +52,34 @@
       //
 
       $lines = explode("\n", $contents);
+      $headers = [];
 
       $found = count($lines) > 3 && rtrim($lines[0]) == '---';
-      $headers = [];
-      for($i = 1; $i < count($lines); $i++) {
-        if($lines[$i] == '---') break;
-        if(!preg_match('/^([a-z0-9_-]+):(.+)$/', $lines[$i], $match)) {
-          $found = false;
-          break;
-        } else {
-          $headers[$match[1]] = trim($match[2]);
+      if($found) {
+        for($i = 1; $i < count($lines); $i++) {
+          if($lines[$i] == '---') break;
+          if(!preg_match('/^([a-z0-9_-]+):(.+)$/', $lines[$i], $match)) {
+            $found = false;
+            break;
+          } else {
+            $headers[$match[1]] = trim($match[2]);
+          }
         }
+        $found = $found && $i < count($lines);
       }
-      $found = $found && $i < count($lines);
-
-      if($found) $contents = implode("\n", array_slice($lines, $i));
 
       if(isset($headers['redirect'])) {
         header("Location: {$headers['redirect']}");
         exit;
+      }
+
+      if($found) {
+        $contents = implode("\n", array_slice($lines, $i));
+      } else {
+        // We are going to search for the first '#' style heading
+        if(preg_match('/^(#)+ (.+)$/m', $contents, $sub)) {
+          $headers['title'] = $sub[2];
+        }
       }
 
       $this->pagetitle = isset($headers['title']) ? $headers['title'] : 'Untitled';
