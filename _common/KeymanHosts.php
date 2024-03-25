@@ -140,13 +140,13 @@
         $this->keymanweb_com = "https://keymanweb.com";
         $this->r_keymanweb_com = "https://r.keymanweb.com";
       } else if($this->tier == KeymanHosts::TIER_DEVELOPMENT) {
-        // Locally running sites via Docker need to access "host.docker.internal:[port]"
+        // Assume website-local-proxy running for local sites
         $this->s_keyman_com = "http://s.keyman.com.localhost"; // goes to website-local-proxy
-        $this->api_keyman_com = "http://host.docker.internal:8058";
-        $this->help_keyman_com = "http://host.docker.internal:8055";
+        $this->api_keyman_com = "http://api.keyman.com.localhost";
+        $this->help_keyman_com = "http://help.keyman.com.localhost";
         $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
-        $this->keyman_com = "http://host.docker.internal:8053";
-        $this->keymanweb_com = "http://host.docker.internal:8057";
+        $this->keyman_com = "http://keyman.com.localhost";
+        $this->keymanweb_com = "http://keymanweb.com.localhost";
         $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
       } else {
         $this->s_keyman_com = "{$site_protocol}s.keyman.com{$this->site_suffix}";
