@@ -8,7 +8,7 @@
     // * development = [x.]keyman.com.localhost
     // * Staging = [x.]keyman-staging.com
     // * Production = [x.]keyman.com
-    // * Test = GitHub actions, localhost:8888 (uses staging tier for other hosts)
+    // * Test = GitHub actions, localhost:8888 (uses production tier for other hosts)
     const TIER_DEVELOPMENT = "TIER_DEVELOPMENT";
     const TIER_STAGING = "TIER_STAGING";
     const TIER_PRODUCTION = "TIER_PRODUCTION";
@@ -24,8 +24,6 @@
       $keyman_com_host,  $keymanweb_com_host, $r_keymanweb_com_host, $blog_keyman_com_host,
       $donate_keyman_com_host, $translate_keyman_com_host, $sentry_keyman_com_host;
 
-    private $site_suffix;
-
     private $tier;
 
     private static $instance;
@@ -34,10 +32,6 @@
       if(!self::$instance)
         self::Rebuild();
       return self::$instance;
-    }
-
-    public function Site_Suffix() {
-      return $this->site_suffix;
     }
 
     public function Tier() {
@@ -92,70 +86,44 @@
         $this->tier = KeymanHosts::TIER_DEVELOPMENT;
       }
 
-      switch($this->tier) {
-      // Not all these are currently used but helps to cleanup confusion
-      case KeymanHosts::TIER_PRODUCTION:
-      case KeymanHosts::TIER_STAGING:
-        $this->site_suffix = '';
-        $site_protocol = 'https://';
-        break;
-      case KeymanHosts::TIER_TEST:
-        $this->site_suffix = '';
-        $site_protocol = 'http://';
-        break;
-      case KeymanHosts::TIER_DEVELOPMENT:
-        $this->site_suffix = '.localhost';
-        $site_protocol = 'http://';
-        break;
-      default:
-        die("tier is '$this->tier' which is invalid\n");
-      }
-
-      // Append reverse-proxy port
-      if (isset($env['KEYMAN_COM_PROXY_PORT'])) {
-        $this->site_suffix .= ':'.$env['KEYMAN_COM_PROXY_PORT'];
-      }
-
+      // Following domains always point to production sites:
       $this->blog_keyman_com = "https://blog.keyman.com";
       $this->donate_keyman_com = "https://donate.keyman.com";
       $this->translate_keyman_com = "https://translate.keyman.com";
       $this->sentry_keyman_com = "https://sentry.keyman.com";
+      $this->downloads_keyman_com = "https://downloads.keyman.com";
+      $this->r_keymanweb_com = "https://r.keymanweb.com";
 
       if($this->tier == KeymanHosts::TIER_STAGING) {
-        // As we build more staging areas, change these over as well. Assumption that we'll stage across multiple sites is a
-        // little presumptuous but we can live with it.
-        $this->s_keyman_com = "https://s.keyman.com";
+        $this->s_keyman_com = "https://s.keyman-staging.com";
         $this->api_keyman_com = "https://api.keyman-staging.com";
         $this->help_keyman_com = "https://help.keyman-staging.com";
-        $this->downloads_keyman_com = "https://downloads.keyman.com";
         $this->keyman_com = "https://keyman-staging.com";
-        $this->keymanweb_com = "https://keymanweb.com";
-        $this->r_keymanweb_com = "https://r.keymanweb.com";
+        $this->keymanweb_com = "https://web.keyman-staging.com";
       } else if($this->tier == KeymanHosts::TIER_TEST) {
+        // Note, cross-site references on test are always to production sites
         $this->s_keyman_com = "https://s.keyman.com";
         $this->api_keyman_com = "https://api.keyman.com";
         $this->help_keyman_com = "https://help.keyman.com";
-        $this->downloads_keyman_com = "https://downloads.keyman.com";
         $this->keyman_com = "https://keyman.com";
         $this->keymanweb_com = "https://keymanweb.com";
-        $this->r_keymanweb_com = "https://r.keymanweb.com";
       } else if($this->tier == KeymanHosts::TIER_DEVELOPMENT) {
-        // Locally running sites via Docker need to access "host.docker.internal:[port]"
-        $this->s_keyman_com = "http://s.keyman.com.localhost"; // goes to website-local-proxy
-        $this->api_keyman_com = "http://host.docker.internal:8058";
-        $this->help_keyman_com = "http://host.docker.internal:8055";
-        $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
-        $this->keyman_com = "http://host.docker.internal:8053";
-        $this->keymanweb_com = "http://host.docker.internal:8057";
-        $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
+        // Note: locally running sites via Docker require website-local-proxy to be running
+        // Append reverse-proxy port
+        $local_port = isset($env['KEYMAN_COM_PROXY_PORT']) ? ':'.$env['KEYMAN_COM_PROXY_PORT'] : '';
+        $this->s_keyman_com = "http://s.keyman.com.localhost{$local_port}";
+        $this->api_keyman_com = "http://api.keyman.com.localhost{$local_port}";
+        $this->help_keyman_com = "http://help.keyman.com.localhost{$local_port}";
+        $this->keyman_com = "http://keyman.com.localhost{$local_port}";
+        $this->keymanweb_com = "http://keymanweb.com.localhost{$local_port}";
+      } else if($this->tier == KeymanHosts::TIER_PRODUCTION) {
+        $this->s_keyman_com = "https://s.keyman.com";
+        $this->api_keyman_com = "https://api.keyman.com";
+        $this->help_keyman_com = "https://help.keyman.com";
+        $this->keyman_com = "https://keyman.com";
+        $this->keymanweb_com = "https://keymanweb.com";
       } else {
-        $this->s_keyman_com = "{$site_protocol}s.keyman.com{$this->site_suffix}";
-        $this->api_keyman_com = "{$site_protocol}api.keyman.com{$this->site_suffix}";
-        $this->help_keyman_com = "{$site_protocol}help.keyman.com{$this->site_suffix}";
-        $this->downloads_keyman_com = "https://downloads.keyman.com"; // local dev domain is usually not available
-        $this->keyman_com = "{$site_protocol}keyman.com{$this->site_suffix}";
-        $this->keymanweb_com = "{$site_protocol}keymanweb.com{$this->site_suffix}";
-        $this->r_keymanweb_com = "https://r.keymanweb.com"; /// local dev domain is usually not available
+        die("tier is '$this->tier' which is invalid\n");
       }
 
       $this->fixupHosts();
