@@ -41,7 +41,7 @@ if [[ -z ${BOOTSTRAP_ROOT+x} ]]; then
 fi
 
 if [[ -z ${BOOTSTRAP_CURRENT_VERSION_FILE+x} ]]; then
-  readonly BOOTSTRAP_CURRENT_VERSION_FILE="$(dirname $BOOTSTRAP)/.bootstrap-version"
+  readonly BOOTSTRAP_CURRENT_VERSION_FILE="$(dirname "$BOOTSTRAP")/.bootstrap-version"
 fi
 
 #
