@@ -92,7 +92,7 @@ function start_docker_container() {
     ADD_HOST="--add-host host.docker.internal:host-gateway"
   fi
 
-  docker run --rm -d -p $PORT:80 -v ${SITE_HTML} \
+  docker run --rm -d -p $PORT:80 -v "${SITE_HTML}" \
     -e S_KEYMAN_COM=localhost:$PORT_S_KEYMAN_COM \
     -e API_KEYMAN_COM=localhost:$PORT_API_KEYMAN_COM \
     --name $CONTAINER_DESC \
