@@ -101,7 +101,7 @@ function _bootstrap_configure_common() {
     KeymanHosts.php
     KeymanSentry.php
     MarkdownHost.php
-    ImageRabdomizer.php
+    ImageRandomizer.php
   )
   local common_file=
 
