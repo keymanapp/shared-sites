@@ -101,6 +101,7 @@ function _bootstrap_configure_common() {
     KeymanHosts.php
     KeymanSentry.php
     MarkdownHost.php
+    ImageRandomizer.php
   )
   local common_file=
 
@@ -112,7 +113,35 @@ function _bootstrap_configure_common() {
     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
   done
 
+  local ASSET_LOGOS=(
+    sil-logo-abbysinica.png
+    sil-logo-andika-v1.png
+    sil-logo-andika-v2.png
+    sil-logo-annapurna.png
+    sil-logo-tai-heritage-pro.png
+  )
+  _bootstrap_echo "Downloading _common/assets/sil-logos-2024/ files"
+
+  _bootstrap_download "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
+
   _bootstrap_echo "All _common files downloaded"
+}
+
+#
+# Download a directory
+#
+function _bootstrap_download_directory() {
+  local source_dir="$1"
+  local target_dir="$2"
+
+  mkdir -p "$target_dir"
+
+  for file in $(find "$source_dir" -type f); do
+    local relative_path="${file#$source_dir/}"
+    local target_file="$target_dir/$relative_path"
+    mkdir -p "$(dirname "$target_file")"
+    _bootstrap_download "$file" "$target_file"
+  done
 }
 
 #
