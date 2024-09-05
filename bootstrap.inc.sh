@@ -112,19 +112,10 @@ function _bootstrap_configure_common() {
   for common_file in "${COMMON_FILES[@]}"; do
     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
   done
-
-  local ASSET_LOGOS=(
-    sil-logo-abbysinica.png
-    sil-logo-andika-v1.png
-    sil-logo-andika-v2.png
-    sil-logo-annapurna.png
-    sil-logo-tai-heritage-pro.png
-  )
+  
   _bootstrap_echo "Downloading _common/assets/sil-logos-2024/ files"
 
-  for asset_files in "${ASSET_LOGOS[@]}"; do
-    _bootstrap_download "_common/assets/sil-logos-2024/$asset_files" "$BOOTSTRAP_COMMON/assets/sil-logos-2024/$asset_files"
-  done
+  _bootstrap_download_directory "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
 
   _bootstrap_echo "All _common files downloaded"
 }
