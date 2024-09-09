@@ -51,7 +51,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
+  curl -fsL "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
@@ -115,7 +115,7 @@ function _bootstrap_configure_common() {
 
   _bootstrap_echo "Downloading _common/assets/sil-logos-2024/ files"
 
-  _bootstrap_download_directory "_common/assets/sil-logos-2024/" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
+  _bootstrap_download_directory "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
 
   _bootstrap_echo "All _common files downloaded"
 }
