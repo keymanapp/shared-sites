@@ -66,6 +66,10 @@ function start_docker_container() {
   local CONTAINER_DESC=$3
   local HOST=$4
   local PORT=$5
+  local BUILDER_CONFIGURATION="release"
+  if [[ $# -eq 6 ]]; then
+    BUILDER_CONFIGURATION=$6
+  fi
 
   _verify_vendor_is_not_folder
 
@@ -117,7 +121,9 @@ function start_docker_container() {
       builder_die "Docker container appears to have failed to start in order to run init-container.sh script"
     fi
 
-    docker exec -i $CONTAINER_ID sh -c "./resources/init-container.sh"
+    cmd="./resources/init-container.sh ${BUILDER_CONFIGURATION}"
+    builder_echo green "cmd is ${cmd}"
+    docker exec -i $CONTAINER_ID sh -c "${cmd}"
   fi
 
   builder_echo green "Listening on http://$HOST:$PORT"
