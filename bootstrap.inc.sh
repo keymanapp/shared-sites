@@ -60,7 +60,7 @@ function _bootstrap_download() {
 
       mkdir -p "$(dirname "$target_file")"
 
-      curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/refs/heads/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
+      curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
         _bootstrap_echo "FATAL: Failed to download $target_file"
         exit 3
       )
@@ -68,10 +68,10 @@ function _bootstrap_download() {
   else 
     _bootstrap_echo "  Downloading $remote_file"
 
-  curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/refs/heads/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
-    _bootstrap_echo "FATAL: Failed to download $remote_file"
-    exit 3
-  )
+    curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
+      _bootstrap_echo "FATAL: Failed to download $remote_file"
+      exit 3
+    )
   fi
 }
 
