@@ -60,7 +60,10 @@ function _bootstrap_download() {
 
       mkdir -p "$(dirname "$target_file")"
 
-      _bootstrap_download "$file" "$target_file"
+      curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
+        _bootstrap_echo "FATAL: Failed to download $target_file"
+        exit 3
+      )
     done
   else 
     _bootstrap_echo "  Downloading $remote_file"
