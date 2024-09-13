@@ -51,7 +51,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
 
-  if [[ -d "$remote_file"]]; then
+  if [[ -d "$remote_file"]] then
     _bootstrap_echo "Downloading directory: $remote_file"
 
     for file in $(find "$remote_file" -type f); do
@@ -131,8 +131,6 @@ function _bootstrap_configure_common() {
   for common_file in "${COMMON_FILES[@]}"; do
     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
   done
-
-  # _bootstrap_download_directory "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
 
   _bootstrap_echo "All _common files downloaded"
 }
