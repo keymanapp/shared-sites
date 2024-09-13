@@ -50,11 +50,26 @@ fi
 function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
-  _bootstrap_echo "  Downloading $remote_file"
+
+  if [[-d "$remote_file"]]; then
+    _bootstrap_echo "Downloading directory: $remote_file"
+
+    for file in $(find "$remote_file" -type f); do
+      local relative_path="${file#remote_file}"
+      local target_file="$local_file/$relative_path"
+
+      mkdir -p "$(dirname "$target_file")"
+
+      _bootstrap_download "$file" "$target_file"
+    done
+  else 
+    _bootstrap_echo "  Downloading $remote_file"
+
   curl -fsL "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
+  fi
 }
 
 function _bootstrap_echo() {
@@ -94,6 +109,7 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
+    assets
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
@@ -113,35 +129,9 @@ function _bootstrap_configure_common() {
     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
   done
 
-  _bootstrap_echo "Downloading _common/assets/sil-logos-2024/ files"
-
-  _bootstrap_download_directory "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
+  # _bootstrap_download_directory "_common/assets/sil-logos-2024" "$BOOTSTRAP_COMMON/assets/sil-logos-2024"
 
   _bootstrap_echo "All _common files downloaded"
-}
-
-#
-# Download a directory
-#
-function _bootstrap_download_directory() {
-  local source_dir="$1"
-  local target_dir="$2"
-
-  mkdir -p "$target_dir"
-
-  local ASSET_LOGOS=(
-    sil-logo-abbysinica.png
-    sil-logo-andika-v1.png
-    sil-logo-andika-v2.png
-    sil-logo-annapurna.png
-    sil-logo-tai-heritage-pro.png
-  )
-  for logo in "${ASSET_LOGOS[@]}";do
-    local remote_file="$source_dir/$logo"
-    local local_file="$target_dir/$logo"
-
-    _bootstrap_download "$remote_file" "$local_file"
-  done
 }
 
 #
