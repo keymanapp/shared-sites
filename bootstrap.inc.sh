@@ -73,6 +73,7 @@ function _bootstrap_download() {
       # Download the file (assuming files are hosted at some remote URL)
       curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$relative_path" -o "$target_file" || (
         echo "Failed to download $relative_path"
+        exit 3
       )
     done
   else 
