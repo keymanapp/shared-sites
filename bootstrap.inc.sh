@@ -55,7 +55,7 @@ function _bootstrap_download() {
     _bootstrap_echo "Downloading directory: $remote_file"
 
     for file in "${remote_file}/*"; do
-      echo "Your dir & file: $file";
+      _bootstrap_echo "Your dir & file: $file";
       # local relative_path="${file#remote_file/}"
       # local target_file="$local_file/$relative_path"
 
