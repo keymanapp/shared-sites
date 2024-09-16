@@ -55,7 +55,7 @@ function _bootstrap_download() {
     _bootstrap_echo "Downloading directory: $remote_file"
 
     # Find all files recursively in the remote directory (using a local mirror)
-    for file in $(find "$remote_dir" -type f); do
+    for file in $(find "$remote_file" -type f); do
       # Calculate the relative path (removing the remote directory part)
       local relative_path="${file#$remote_file/}"
       
