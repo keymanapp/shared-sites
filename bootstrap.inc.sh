@@ -51,12 +51,15 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
 
+  local file=
+
   if [[ -d "$remote_file" ]]; then
     _bootstrap_echo "Downloading directory: $remote_file"
 
     # Find all files recursively in the remote directory (using a local mirror)
-    for file in $(find "$remote_file" -type f); do
+    for file in "$(find "$remote_file" -type f)"; do
       # Calculate the relative path (removing the remote directory part)
+      _bootstrap_echo "Files: $file"
       local relative_path="${file#$remote_file/}"
       
       # Construct the target path for the file in the local directory
@@ -64,6 +67,8 @@ function _bootstrap_download() {
 
       # Create any necessary subdirectories in the local directory
       mkdir -p "$(dirname "$target_file")"
+      _bootstrap_echo "Relative path: $relative_path"
+      _bootstrap_echo "Target file: $target_file"
 
       # Download the file (assuming files are hosted at some remote URL)
       curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
