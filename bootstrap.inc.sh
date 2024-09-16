@@ -113,7 +113,7 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
-    assets
+    assets/sil-logos-2024/
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
