@@ -54,16 +54,17 @@ function _bootstrap_download() {
   if [[ -d "$remote_file" ]]; then
     _bootstrap_echo "Downloading directory: $remote_file"
 
-    for file in "$(find "$remote_file" -type f)"; do
-      local relative_path="${file#remote_file/}"
-      local target_file="$local_file/$relative_path"
+    for file in "${remote_file}/*"; do
+      echo "Your dir & file: $file";
+      # local relative_path="${file#remote_file/}"
+      # local target_file="$local_file/$relative_path"
 
-      mkdir -p "$(dirname "$target_file")"
+      # mkdir -p "$(dirname "$target_file")"
 
-      curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
-        _bootstrap_echo "FATAL: Failed to download $target_file"
-        exit 3
-      )
+      # curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
+      #   _bootstrap_echo "FATAL: Failed to download $target_file"
+      #   exit 3
+      # )
     done
   else 
     _bootstrap_echo "  Downloading $remote_file"
