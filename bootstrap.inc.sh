@@ -123,7 +123,8 @@ function _bootstrap_configure_common() {
     KeymanSentry.php
     MarkdownHost.php
     ImageRandomizer.php
-    assets/sil-logos-2024/
+    assets/sil-logos-2024/sil-logo-abbysinica.png
+    assets/sil-logos-2024/sil-logo-andika-v1.png
   )
   local common_file=
 
