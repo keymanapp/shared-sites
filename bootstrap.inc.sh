@@ -133,7 +133,7 @@ function _bootstrap_configure_common() {
     if [[ "$common_file" == */ ]]; then
       for dir in "_common/$common_file"; do
         cd "$dir"
-        _bootstrap_directory_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
+        _bootstrap_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
       done
     else
       _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
