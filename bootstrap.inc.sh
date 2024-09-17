@@ -51,16 +51,12 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
 
-  if [[ "$remote_file" == */ ]]; then
-    _bootstrap_directory_download "$remote_file" "$local_file"
-  else 
-    _bootstrap_echo "  Downloading $remote_file"
+  _bootstrap_echo "  Downloading $remote_file"
 
-    curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
-      _bootstrap_echo "FATAL: Failed to download $remote_file"
-      exit 3
-    )
-  fi
+  curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
+    _bootstrap_echo "FATAL: Failed to download $remote_file"
+    exit 3
+  )
 }
 
 function _bootstrap_directory_download() {
@@ -115,6 +111,8 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
+    assets/sil-logos-2024/
+    assets/
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
@@ -123,8 +121,6 @@ function _bootstrap_configure_common() {
     KeymanSentry.php
     MarkdownHost.php
     ImageRandomizer.php
-    assets/sil-logos-2024/sil-logo-abbysinica.png
-    assets/sil-logos-2024/sil-logo-andika-v1.png
   )
   local common_file=
 
@@ -132,8 +128,16 @@ function _bootstrap_configure_common() {
   rm -rf "$BOOTSTRAP_COMMON"
   mkdir -p "$BOOTSTRAP_COMMON"
 
+  
   for common_file in "${COMMON_FILES[@]}"; do
-    _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
+    if [[ "$common_file" == */ ]]; then
+      for dir in "_common/$common_file"; do
+        cd "$dir"
+        _bootstrap_directory_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
+      done
+    else
+      _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
+    fi
   done
 
   _bootstrap_echo "All _common files downloaded"
