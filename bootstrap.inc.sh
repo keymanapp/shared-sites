@@ -111,7 +111,6 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
-    assets/
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
