@@ -52,17 +52,7 @@ function _bootstrap_download() {
   local local_file="$2"
 
   if [[ "$remote_file" == */ ]]; then
-    mkdir -p "$local_file"
-    _bootstrap_echo "Download Directory: $remote_file"
-      
-    for file in "$(find "$remote_file" -type f)"; do
-      local relative_path="${file#$remote_file/}"
-      local target_file="$local_file/$relative_path"
-
-      mkdir -p "$(dirname "$target_file")"
-
-      _bootstrap_download "$file" "$target_file"
-    done
+    _bootstrap_directory_download "$remote_file" "$local_file"
   else 
     _bootstrap_echo "  Downloading $remote_file"
 
@@ -71,6 +61,21 @@ function _bootstrap_download() {
       exit 3
     )
   fi
+}
+
+function _bootstrap_directory_download() {
+  local $remote_file="$1"
+  local $local_file="$2"
+
+  mkdir -p "$local_file"
+  for file in "$(find "$remote_file" -type f)"; do
+    local relative_path="${file#$remote_file/}"
+    local target_file="$local_file/$relative_path"
+
+    mkdir -p "$(dirname "$target_file")"
+    
+    _bootstrap_download "$file" "$target_file"
+  done
 }
 
 function _bootstrap_echo() {
