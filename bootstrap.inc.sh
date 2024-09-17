@@ -128,10 +128,10 @@ function _bootstrap_configure_common() {
   rm -rf "$BOOTSTRAP_COMMON"
   mkdir -p "$BOOTSTRAP_COMMON"
 
-  
   for common_file in "${COMMON_FILES[@]}"; do
     if [[ "$common_file" == */ ]]; then
       for dir in "_common/$common_file"; do
+      _bootstrap_echo $dir
         cd "$dir"
         _bootstrap_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
       done
