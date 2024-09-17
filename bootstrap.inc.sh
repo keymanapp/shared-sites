@@ -118,7 +118,7 @@ function _bootstrap_configure_common() {
     KeymanSentry.php
     MarkdownHost.php
     ImageRandomizer.php
-    assets/
+    assets/sil-logos-2024/
   )
   local common_file=
 
