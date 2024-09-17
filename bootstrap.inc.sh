@@ -122,8 +122,10 @@ function _bootstrap_configure_common() {
   )
   local IMG_FILES=(
     sil-logo-abbysinica.png
+    sil-logo-andika-v1.png
   )
   local common_file=
+  local img_file=
 
   _bootstrap_echo "Downloading _common files"
   rm -rf "$BOOTSTRAP_COMMON"
@@ -134,6 +136,7 @@ function _bootstrap_configure_common() {
   done
 
   for img_file in "${IMG_FILES[@]}"; do
+    mkdir -p "$BOOTSTRAP_COMMON/assets/sil-logos-2024/"
     _bootstrap_download "_common/assets/sil-logos-2024/$img_file" "$BOOTSTRAP_COMMON/assets/sil-logos-2024/$img_file"
   done
   # for common_file in "${COMMON_FILES[@]}"; do
