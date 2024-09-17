@@ -111,7 +111,6 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
-    assets/
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
@@ -121,6 +120,9 @@ function _bootstrap_configure_common() {
     MarkdownHost.php
     ImageRandomizer.php
   )
+  local IMG_FILES=(
+    sil-logo-abbysinica.png
+  )
   local common_file=
 
   _bootstrap_echo "Downloading _common files"
@@ -128,18 +130,25 @@ function _bootstrap_configure_common() {
   mkdir -p "$BOOTSTRAP_COMMON"
 
   for common_file in "${COMMON_FILES[@]}"; do
-  _bootstrap_echo "Common files: $common_file"
-    if [[ "$common_file" == */ ]]; then
-      for dir in "_common/$common_file"; do
-        _bootstrap_echo "Directoy: $dir"
-        cd "$dir"
-        _bootstrap_echo "$BOOTSTRAP_COMMON/$dir"
-        _bootstrap_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
-      done
-    else
-      _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
-    fi
+    _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
   done
+
+  for img_file in "${IMG_FILES[@]}"; do
+    _bootstrap_download "_common/assets/sil-logos-2024/$img_file" "$BOOTSTRAP_COMMON/assets/sil-logos-2024/$img_file"
+  done
+  # for common_file in "${COMMON_FILES[@]}"; do
+  # _bootstrap_echo "Common files: $common_file"
+  #   if [[ "$common_file" == */ ]]; then
+  #     for dir in "_common/$common_file"; do
+  #       _bootstrap_echo "Directoy: $dir"
+  #       cd "$dir"
+  #       _bootstrap_echo "$BOOTSTRAP_COMMON/$dir"
+  #       _bootstrap_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
+  #     done
+  #   else
+  #     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
+  #   fi
+  # done
 
   _bootstrap_echo "All _common files downloaded"
 }
