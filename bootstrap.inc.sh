@@ -123,6 +123,9 @@ function _bootstrap_configure_common() {
   local IMG_FILES=(
     sil-logo-abbysinica.png
     sil-logo-andika-v1.png
+    sil-logo-andika-v2.png
+    sil-logo-annapurna.png
+    sil-logo-tai-heritage-pro.png
   )
   local common_file=
   local img_file=
