@@ -111,7 +111,6 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
-    assets/sil-logos-2024/
     assets/
     builder.inc.sh
     docker.inc.sh
@@ -132,11 +131,10 @@ function _bootstrap_configure_common() {
   _bootstrap_echo "Common files: $common_file"
     if [[ "$common_file" == */ ]]; then
       for dir in "_common/$common_file"; do
-        _bootstrap_echo "$dir"
-        cd "Directoy: $dir"
+        _bootstrap_echo "Directoy: $dir"
+        cd "$dir"
         _bootstrap_echo "$BOOTSTRAP_COMMON/$dir"
         _bootstrap_download "_common/$dir" "$BOOTSTRAP_COMMON/$dir"
-
       done
     else
       _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
