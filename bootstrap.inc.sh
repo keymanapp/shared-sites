@@ -51,30 +51,17 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
 
-  local file=
-
-  if [[ -d "$remote_file" ]]; then
-    _bootstrap_echo "Downloading directory: $remote_file"
-
-    # Find all files recursively in the remote directory (using a local mirror)
-    for file in "$(find "$remote_file" -type f)"; do
-      # Calculate the relative path (removing the remote directory part)
-      _bootstrap_echo "Files: $file"
-      local relative_path="${file#$remote_file/}"
+  if [[ "$remote_file" == */ ]]; then
+    mkdir -p "$local_file"
+    _bootstrap_echo "Download Directory: $remote_file"
       
-      # Construct the target path for the file in the local directory
+    for file in "$(find "$remote_file" -type f)"; do
+      local relative_path="${file#$remote_file/}"
       local target_file="$local_file/$relative_path"
 
-      # Create any necessary subdirectories in the local directory
       mkdir -p "$(dirname "$target_file")"
-      _bootstrap_echo "Relative path: $relative_path"
-      _bootstrap_echo "Target file: $target_file"
 
-      # Download the file (assuming files are hosted at some remote URL)
-      curl -fsL "https://raw.githubusercontent.com/Meng-Heng/shared-sites/$BOOTSTRAP_VERSION/$relative_path" -o "$target_file" || (
-        echo "Failed to download $relative_path"
-        exit 3
-      )
+      _bootstrap_download "$file" "$target_file"
     done
   else 
     _bootstrap_echo "  Downloading $remote_file"
@@ -123,7 +110,6 @@ function bootstrap_configure() {
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
   local COMMON_FILES=(
-    assets
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
@@ -132,6 +118,7 @@ function _bootstrap_configure_common() {
     KeymanSentry.php
     MarkdownHost.php
     ImageRandomizer.php
+    assets/
   )
   local common_file=
 
