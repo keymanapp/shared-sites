@@ -55,6 +55,7 @@ function _bootstrap_download() {
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
+
 }
 
 function _bootstrap_echo() {
