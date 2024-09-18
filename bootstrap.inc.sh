@@ -93,6 +93,7 @@ function bootstrap_configure() {
 #
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
+  local ASSET_LOGOS="assets/sil-logos-2024"
   local COMMON_FILES=(
     builder.inc.sh
     docker.inc.sh
@@ -122,8 +123,8 @@ function _bootstrap_configure_common() {
   done
 
   for img_file in "${IMG_FILES[@]}"; do
-    mkdir -p "$BOOTSTRAP_COMMON/assets/sil-logos-2024/"
-    _bootstrap_download "_common/assets/sil-logos-2024/$img_file" "$BOOTSTRAP_COMMON/assets/sil-logos-2024/$img_file"
+    mkdir -p "$BOOTSTRAP_COMMON/$ASSET_LOGOS/"
+    _bootstrap_download "_common/$ASSET_LOGOS/$img_file" "$BOOTSTRAP_COMMON/$ASSET_LOGOS/$img_file"
   done
 
   _bootstrap_echo "All _common files downloaded"
