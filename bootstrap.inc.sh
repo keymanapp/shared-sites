@@ -55,6 +55,7 @@ function _bootstrap_download() {
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
+
 }
 
 function _bootstrap_echo() {
@@ -93,6 +94,7 @@ function bootstrap_configure() {
 #
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
+  local ASSET_LOGOS="assets/sil-logos-2024"
   local COMMON_FILES=(
     builder.inc.sh
     docker.inc.sh
@@ -101,8 +103,17 @@ function _bootstrap_configure_common() {
     KeymanHosts.php
     KeymanSentry.php
     MarkdownHost.php
+    ImageRandomizer.php
+  )
+  local IMG_FILES=(
+    sil-logo-abbysinica.png
+    sil-logo-andika-v1.png
+    sil-logo-andika-v2.png
+    sil-logo-annapurna.png
+    sil-logo-tai-heritage-pro.png
   )
   local common_file=
+  local img_file=
 
   _bootstrap_echo "Downloading _common files"
   rm -rf "$BOOTSTRAP_COMMON"
@@ -110,6 +121,11 @@ function _bootstrap_configure_common() {
 
   for common_file in "${COMMON_FILES[@]}"; do
     _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
+  done
+
+  for img_file in "${IMG_FILES[@]}"; do
+    mkdir -p "$BOOTSTRAP_COMMON/$ASSET_LOGOS/"
+    _bootstrap_download "_common/$ASSET_LOGOS/$img_file" "$BOOTSTRAP_COMMON/$ASSET_LOGOS/$img_file"
   done
 
   _bootstrap_echo "All _common files downloaded"

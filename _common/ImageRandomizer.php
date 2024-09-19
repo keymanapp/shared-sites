@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Keyman\Site\Common;
 
@@ -15,5 +16,3 @@ class ImageRandomizer {
     return "Not found";
   }
 }
-
-?>
