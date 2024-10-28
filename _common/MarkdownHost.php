@@ -17,7 +17,7 @@
     }
 
     function PageDescription() {
-      return $this->pagedescription;
+      return isset($this->pagedescription) ? $this->pagedescription : '';
     }
 
     function Content() {
