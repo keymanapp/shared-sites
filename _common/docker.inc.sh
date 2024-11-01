@@ -73,6 +73,12 @@ function start_docker_container() {
 
   _verify_vendor_is_not_folder
 
+  if [ $BUILDER_CONFIGURATION =~ debug ]; then
+    touch _control/debug
+  else
+    rm -f _control/debug
+  fi
+
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
   if [ ! -z "$CONTAINER_ID" ]; then
     builder_die "$HOST container $CONTAINER_ID has already been started"
