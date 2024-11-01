@@ -87,12 +87,14 @@
 
       // Performs the parsing + prettification of Markdown for display through PHP.
       $Parsedown = new \ParsedownExtra();
+      $Alerts = new \Keyman\Site\Common\GFMAlerts;
 
       // Does the magic.
-      $this->content =
-       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" .
-       "<div class='markdown'>" .
-       $Parsedown->text($contents) .
+       
+       $this->content = 
+       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" . 
+       "<div class='markdown'>" . 
+       $Alerts->text($contents) . 
        "</div>";
     }
   }
