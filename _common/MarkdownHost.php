@@ -6,10 +6,15 @@
   use Keyman\Site\Common\KeymanHosts;
 
   class MarkdownHost {
-    private $content, $pagetitle, $showMenu, $pagedescription;
+    private $content, $pagetitle, $language, $showMenu, $pagedescription;
 
     function PageTitle() {
       return $this->pagetitle;
+    }
+
+    function Language() {
+      // Return the lang to use for the page. Default to 'en'
+      return $this->language;
     }
 
     function ShowMenu() {
@@ -92,6 +97,7 @@
       if (isset($headers['description'])) {
         $this->pagedescription = $headers['description'];
       }
+      $this->language = isset($headers['language']) ? $headers['language'] : 'en';
 
       // Performs the parsing + prettification of Markdown for display through PHP.
       $Parsedown = new \ParsedownExtra();
