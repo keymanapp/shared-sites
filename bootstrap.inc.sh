@@ -99,6 +99,7 @@ function _bootstrap_configure_common() {
     builder.inc.sh
     docker.inc.sh
     keyman-local-ports.inc.sh
+    GFMAlerts.php
     JsonApiFailure.php
     KeymanHosts.php
     KeymanSentry.php
