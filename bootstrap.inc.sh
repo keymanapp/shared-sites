@@ -94,6 +94,7 @@ function bootstrap_configure() {
 #
 function _bootstrap_configure_common() {
   local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
+  local ASSET_IMGS="assets/img"
   local ASSET_LOGOS="assets/sil-logos-2024"
   local COMMON_FILES=(
     builder.inc.sh
@@ -107,6 +108,9 @@ function _bootstrap_configure_common() {
     ImageRandomizer.php
   )
   local IMG_FILES=(
+    gfmalerts.png
+  )
+  local LOGO_FILES=(
     sil-logo-abbysinica.png
     sil-logo-andika-v1.png
     sil-logo-andika-v2.png
@@ -125,8 +129,13 @@ function _bootstrap_configure_common() {
   done
 
   for img_file in "${IMG_FILES[@]}"; do
+    mkdir -p "$BOOTSTRAP_COMMON/$ASSET_IMGS/"
+    _bootstrap_download "_common/$ASSET_IMGS/$img_file" "$BOOTSTRAP_COMMON/$ASSET_IMGS/$img_file"
+  done
+
+  for logo_file in "${LOGO_FILES[@]}"; do
     mkdir -p "$BOOTSTRAP_COMMON/$ASSET_LOGOS/"
-    _bootstrap_download "_common/$ASSET_LOGOS/$img_file" "$BOOTSTRAP_COMMON/$ASSET_LOGOS/$img_file"
+    _bootstrap_download "_common/$ASSET_LOGOS/$logo_file" "$BOOTSTRAP_COMMON/$ASSET_LOGOS/$logo_file"
   done
 
   _bootstrap_echo "All _common files downloaded"
