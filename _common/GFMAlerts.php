@@ -23,15 +23,14 @@ class GFMAlerts extends Parsedown
        $this->BlockTypes['>'][] = 'Alert';
     }
 
-    protected function blockQuote($block)
+    protected function blockQuote($line)
     {
-        if(!preg_match('/^\>\s*\[\!(IMPORTANT|TIPS|NOTE|WARNING|CAUTION)\]\s(.*)/i', $block['text'], $matches)) {
-            return parent::blockQuote($block);
-        }
+        if(!preg_match('/^\>\s*\[\!(IMPORTANT|TIPS|NOTE|WARNING|CAUTION)\]/i', $line['text'], $matches)) {
+            return parent::blockQuote($line);
+        }    
+        // Fetch The Alert's type and title.
         $alertType = strtolower($matches[1]);
         $alertTitle = ucfirst($alertType);
-        $iconType = "";
-        $alertContent = "";
 
         $icon = array(
             // svg and path
@@ -41,16 +40,14 @@ class GFMAlerts extends Parsedown
             'caution' => '<svg class="octicon octicon-stop mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill="red" d="M4.47.22A.749.749 0 0 1 5 0h6c.199 0 .389.079.53.22l4.25 4.25c.141.14.22.331.22.53v6a.749.749 0 0 1-.22.53l-4.25 4.25A.749.749 0 0 1 11 16H5a.749.749 0 0 1-.53-.22L.22 11.53A.749.749 0 0 1 0 11V5c0-.199.079-.389.22-.53Zm.84 1.28L1.5 5.31v5.38l3.81 3.81h5.38l3.81-3.81V5.31L10.69 1.5ZM8 4a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 8 4Zm0 8a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>',
             'warning' => '<svg class="octicon octicon-alert mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path fill="orange" d="M6.457 1.047c.659-1.234 2.427-1.234 3.086 0l6.082 11.378A1.75 1.75 0 0 1 14.082 15H1.918a1.75 1.75 0 0 1-1.543-2.575Zm1.763.707a.25.25 0 0 0-.44 0L1.698 13.132a.25.25 0 0 0 .22.368h12.164a.25.25 0 0 0 .22-.368Zm.53 3.996v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 11a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>'
         );
-        $iconType .= $icon[$alertType] . $alertTitle; // return string
 
-        // check for matches of the $alertType in $icon. If there is no match, return plain text for the block.
         if(empty($icon[$alertType])) {
-            return parent::blockQuote($block);
+            return null;
         }
+        $iconType = $icon[$alertType].$alertTitle;
 
-        $alertContent .= ltrim($matches[2]);
-        
-        return array(
+        // Formatting:> [!AlertType] 
+        $block = array(
             'element' => array(
                 'name' => 'div',
                 'attributes' => array('class' => "markdown-alert markdown-alert-$alertType"),
@@ -58,15 +55,44 @@ class GFMAlerts extends Parsedown
                 'text' => array(
                     array(
                         'name' => 'p',
-                        'attributes' => array('class' => "markdown-alert-title"),
+                        'attributes' => array('class' => "markdown-alert-title title-$alertType"),
                         'rawHtml' => $iconType
                     ),
-                    array(
-                        'name' => 'p',
-                        'text' => $alertContent,
-                    )
                 )
             )
         );
+        // dd($block);
+        return $block;
+    }
+
+    protected function blockQuoteContinue($line, array $block) {
+        if(!preg_match('/^\>\s(.*)/', $line['text'], $matches)) {
+            return null;
+        }
+        // Recognize a new Alert
+        if(preg_match('/^\>\s*\[\!(IMPORTANT|TIPS|NOTE|WARNING|CAUTION)\]/i', $line['text'])) {
+            return null;
+        }
+        
+        if(isset($block['interrupted'])) {
+            $block['element']['text'][] = [
+                'text' => ''
+            ];
+            unset($block['interrupted']);
+        }
+
+        // Continue the Alerts, Formatting: > Content
+        $block['element']['text'][] = [
+            'name' => 'p',
+            'text' => $matches[1],
+        ];
+
+        // dd($block);
+
+        return $block;
+    }
+
+    protected function blockQuoteComplete($block) {
+        return $block;
     }
 }
