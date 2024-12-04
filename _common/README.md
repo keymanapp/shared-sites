@@ -83,9 +83,9 @@ Output:
 
 ```md
 > [!TIPS] 
-> [!IMPORTANT]
+> [!IMPORTANT]              // The Alerts will renders.
 
-> Do NOT do this.       // This will cost an error, but still renders.
+> Do NOT do this.           // This line will appear.
 ```
 
 Output:
