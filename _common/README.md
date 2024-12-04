@@ -85,7 +85,7 @@ Output:
 > [!TIPS] 
 > [!IMPORTANT]              // The Alerts will renders.
 
-> Do NOT do this.           // This line will appear.
+> Do NOT do this.           // This line won't appear.
 ```
 
 Output:
