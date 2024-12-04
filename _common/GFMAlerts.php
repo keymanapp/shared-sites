@@ -42,7 +42,7 @@ class GFMAlerts extends Parsedown
         );
 
         if(empty($icon[$alertType])) {
-            return null;
+            return parent::blockQuote($line);
         }
         $iconType = $icon[$alertType].$alertTitle;
 
@@ -69,16 +69,15 @@ class GFMAlerts extends Parsedown
         if(!preg_match('/^\>\s(.*)/', $line['text'], $matches)) {
             return null;
         }
+        
         // Recognize a new Alert
         if(preg_match('/^\>\s*\[\!(IMPORTANT|TIPS|NOTE|WARNING|CAUTION)\]/i', $line['text'])) {
             return null;
         }
-        
+
+        // Handles any interruption
         if(isset($block['interrupted'])) {
-            $block['element']['text'][] = [
-                'text' => ''
-            ];
-            unset($block['interrupted']);
+            return $block;
         }
 
         // Continue the Alerts, Formatting: > Content
