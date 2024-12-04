@@ -29,13 +29,14 @@ The Five Alerts (Note, Tips, Important, Caution, and Warning) are recognized ins
 ```md
 > [!TIPS] 
 > Keyboard layouts are defined with a clear and easy to understand keyboard grammar.
-                                                                                    
+                                                              
 > [!IMPORTANT] 
 > Keyman originally created in 1993 to type Lao on Windows.
 > Support new lines.
 
 > [!CAUTION] 
 > Keyboard layouts are distributed through an open catalog to all major desktop and mobile platforms.
+Continue your Markdown documentation.
 > [!WARNING] 
 > This is the last GFMAlerts.
 
@@ -45,13 +46,47 @@ The Five Alerts (Note, Tips, Important, Caution, and Warning) are recognized ins
 
 The Alerts can't recognize the inline content and HTML tags. Please stick to the rules/syntax.
 
+1. Not using the `>`
+
 ```md
-> [!WARNING] DO NOT do this.
+> [!WARNING] DO NOT do this.        // Only [!Warning] will show up.
 
 > [!WARNING] DO NOT do this.
-Second line                     
+Second line                
+```
+Output:
 
-> [!WARNING] DO NOT do this.
+![Limitation-1](gfm-limits-1.png)     
+
+2. Indent the second line
+
+```md
+> [!TIPS] DO NOT do this.
     Second line                  
 
 ```
+Output: 
+![Limitation-2](gfm-limits-2.png)
+
+3. Using HTML Tags
+
+```md
+> [!IMPORTANT]
+> <p>P Tags</p>
+
+```
+
+Output:
+![Limitation-3](gfm-limits-3.png)
+
+4. Not completing the Format
+
+```md
+> [!TIPS] 
+> [!IMPORTANT]
+
+> Do NOT do this.       // This will cost an error, but still renders.
+```
+
+Output:
+![Limitation-4](gfm-limits-3.png)
