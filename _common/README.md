@@ -56,7 +56,7 @@ Second line
 ```
 Output:
 
-![Limitation-1](gfm-limits-1.png)     
+![Limitation-1](./assets/img/gfm-limits-1.png)     
 
 2. Indent the second line
 
@@ -66,7 +66,7 @@ Output:
 
 ```
 Output: 
-![Limitation-2](gfm-limits-2.png)
+![Limitation-2](./assets/img/gfm-limits-2.png)
 
 3. Using HTML Tags
 
@@ -77,7 +77,7 @@ Output:
 ```
 
 Output:
-![Limitation-3](gfm-limits-3.png)
+![Limitation-3](./assets/img/gfm-limits-3.png)
 
 4. Not completing the Format
 
@@ -89,4 +89,4 @@ Output:
 ```
 
 Output:
-![Limitation-4](gfm-limits-3.png)
+![Limitation-4](./assets/img/gfm-limits-3.png)
