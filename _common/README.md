@@ -14,45 +14,79 @@ Here are the syntaxes of the Alerts for Keyman websites. There are 5 types of GF
 
 ## Working with Alerts
 
-For every Alert that is used, there should be a gap in between each Alert, then a blank comment. After that, the next Alerts can be used.
+The Five Alerts (Note, Tips, Important, Caution, and Warning) are recognized inside the `[! ]`. This should be able to support multiple lines as long as it is continuing from the previous alerts. Please find the examples below.
 
 * One Alert
 
 ```md
-> [!NOTE] Keyman Facts.
+> [!NOTE] 
+> Keyman Facts.
 
 ```
 
 * More than one
 
 ```md
-> [!TIPS] Keyboard layouts are defined with a clear and easy to understand keyboard grammar.
-                                                                                    // Always leave a line break.
-<!-- Must Include a blank comment between each Alerts -->
-> [!IMPORTANT] Keyman originally created in 1993 to type Lao on Windows.
+> [!TIPS] 
+> Keyboard layouts are defined with a clear and easy to understand keyboard grammar.
+                                                              
+> [!IMPORTANT] 
+> Keyman originally created in 1993 to type Lao on Windows.
+> Support new lines.
 
-<!--  -->
-> [!CAUTION] Keyboard layouts are distributed through an open catalog to all major desktop and mobile platforms.
-
-<!-- Last comment -->
-> [!WARNING] This is the last GFMAlerts.
+> [!CAUTION] 
+> Keyboard layouts are distributed through an open catalog to all major desktop and mobile platforms.
+Continue your Markdown documentation.
+> [!WARNING] 
+> This is the last GFMAlerts.
 
 ```
 
 ## Limitation
 
-The Alerts can't recognize new lines, HTML tags, nor handle two lines or more.
+The Alerts can't recognize the inline content and HTML tags. Please stick to the rules/syntax.
+
+1. Not using the `>`
 
 ```md
-> [!WARNING] DO NOT do this.
-> Second line                   // this will cause a 500 Error
+> [!WARNING] DO NOT do this.        // Only [!Warning] will show up.
 
-<!--  -->
 > [!WARNING] DO NOT do this.
-Second line                     // this will cause a 500 Error
+Second line                
+```
+Output:
 
-<!--  -->
-> [!WARNING] DO NOT do this.
-    Second line                 // this will cause a 500 Error
+![Limitation-1](./assets/img/gfm-limits-1.png)     
+
+2. Indent the second line
+
+```md
+> [!TIPS] DO NOT do this.
+    Second line                  
 
 ```
+Output: 
+![Limitation-2](./assets/img/gfm-limits-2.png)
+
+3. Using HTML Tags
+
+```md
+> [!IMPORTANT]
+> <p>P Tags</p>
+
+```
+
+Output:
+![Limitation-3](./assets/img/gfm-limits-3.png)
+
+4. Not completing the Format
+
+```md
+> [!TIPS] 
+> [!IMPORTANT]              // The Alerts will renders.
+
+> Do NOT do this.           // This line won't appear.
+```
+
+Output:
+![Limitation-4](./assets/img/gfm-limits-3.png)
