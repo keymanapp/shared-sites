@@ -93,14 +93,15 @@
         $this->pagedescription = $headers['description'];
       }
 
-      // Performs the parsing + prettification of Markdown for display through PHP.
-      $Parsedown = new \ParsedownExtra();
+      // Performs the parsing + alerts + prettification of Markdown for display through PHP.
+      $ParsedownAndAlerts = new \Keyman\Site\Common\GFMAlerts();
 
       // Does the magic.
-      $this->content =
-       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" .
-       "<div class='markdown'>" .
-       $Parsedown->text($contents) .
+       
+       $this->content = 
+       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" . 
+       "<div class='markdown'>" . 
+       $ParsedownAndAlerts->text($contents) . 
        "</div>";
     }
   }
