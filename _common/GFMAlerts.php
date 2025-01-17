@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace Keyman\Site\Common;
 
-use Parsedown;
+use ParsedownExtra;
 
-class GFMAlerts extends Parsedown
+class GFMAlerts extends ParsedownExtra
 {
     private $icon = array(
         // svg and path
