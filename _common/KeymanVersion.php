@@ -1,7 +1,7 @@
 <?php
   declare(strict_types=1);
 
-  namespace Keyman\Site\com\keyman;
+  namespace Keyman\Site\Common;
 
   class KeymanVersion {
     /* These constant values must be updated manually when we do a beta or stable release. */
