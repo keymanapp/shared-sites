@@ -14,6 +14,13 @@
     const TIER_PRODUCTION = "TIER_PRODUCTION";
     const TIER_TEST = "TIER_TEST";
 
+    private $tierName = [
+      'TIER_DEVELOPMENT' => 'development',
+      'TIER_STAGING' => 'staging',
+      'TIER_PRODUCTION' => 'production',
+      'TIER_TEST' => 'test',
+    ];
+
     public
       // major k8s hosted sites
       $s_keyman_com, $api_keyman_com, $help_keyman_com,
@@ -46,6 +53,10 @@
 
     public function Tier() {
       return $this->tier;
+    }
+
+    public function TierName() {
+      return $this->tierName[$this->tier];
     }
 
     public static function Rebuild() {
