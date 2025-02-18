@@ -9,7 +9,7 @@
     static function init($dsn) {
       \Sentry\init([
         'dsn' => $dsn,
-        'environment' => KeymanHosts::Instance()->TierName();
+        'environment' => KeymanHosts::Instance()->TierName()
       ]);
     }
   }
