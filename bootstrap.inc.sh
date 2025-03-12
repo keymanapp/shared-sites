@@ -119,7 +119,7 @@ function _bootstrap_configure_common() {
     # CDN support
     if [[ ! -z $cdnfile ]]; then
       mkdir -p "$BOOTSTRAP_LOCAL_COMMON/cdn/$(dirname "$cdnfile")"
-      _bootstrap_download "_common/$cdnfile" "$BOOTSTRAP_LOCAL_COMMON/$cdnfile"
+      _bootstrap_download "_common/cdn/$cdnfile" "$BOOTSTRAP_LOCAL_COMMON/cdn/$cdnfile"
     fi
   done < "$BOOTSTRAP_REGISTRY"
 
