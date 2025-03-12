@@ -4,7 +4,7 @@
   namespace Keyman\Site\Common;
 
   class Assets {
-    static $assets;
+    static private $assets;
     static private function Fill() {
       Assets::$assets = [];
       $registry = explode("\n", file_get_contents(dirname(__DIR__) . "/resources/.bootstrap-registry"));
@@ -17,7 +17,7 @@
       }
     }
 
-    static function Get($name) {
+    static public function Get($name) {
       if(empty(Assets::$assets)) {
         Assets::Fill();
       }
