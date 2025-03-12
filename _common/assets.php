@@ -26,6 +26,6 @@
         return '/_common/assets/' . $name;
       }
 
-      return '/_common/cdn/assets/' . Assets::$assets[$name];
+      return '/_common/assets/' . Assets::$assets[$name];
     }
   }

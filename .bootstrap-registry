@@ -8,7 +8,7 @@ assets/sil-logos-2024/sil-logo-andika-v1.png assets/sil-logos-2024/sil-logo-andi
 assets/sil-logos-2024/sil-logo-andika-v2.png assets/sil-logos-2024/sil-logo-andika-v2.d93c755ddb2056b304d6f8be5adff568ea86c00d.png
 assets/sil-logos-2024/sil-logo-annapurna.png assets/sil-logos-2024/sil-logo-annapurna.c85665d2aa7ed9dd919a5f6044336a13d17e0c2a.png
 assets/sil-logos-2024/sil-logo-tai-heritage-pro.png assets/sil-logos-2024/sil-logo-tai-heritage-pro.0cd269e5adefc991b75d32cb359c23b2fe10cc03.png
-assets.php
+Assets.php
 builder.inc.sh
 docker.inc.sh
 GFMAlerts.php
