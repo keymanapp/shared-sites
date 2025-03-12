@@ -107,9 +107,20 @@ function _bootstrap_configure_common() {
   rm -rf "$BOOTSTRAP_LOCAL_COMMON"
   mkdir -p "$BOOTSTRAP_LOCAL_COMMON"
 
+  local filename
+  local basefile
+  local cdnfile
+
   while read filename; do
-    mkdir -p "$BOOTSTRAP_LOCAL_COMMON/$(dirname "$filename")"
-    _bootstrap_download "_common/$filename" "$BOOTSTRAP_LOCAL_COMMON/$filename"
+    read -r basefile cdnfile <<<"$filename"
+    mkdir -p "$BOOTSTRAP_LOCAL_COMMON/$(dirname "$basefile")"
+    _bootstrap_download "_common/$basefile" "$BOOTSTRAP_LOCAL_COMMON/$basefile"
+
+    # CDN support
+    if [[ ! -z $cdnfile ]]; then
+      mkdir -p "$BOOTSTRAP_LOCAL_COMMON/cdn/$(dirname "$cdnfile")"
+      _bootstrap_download "_common/$cdnfile" "$BOOTSTRAP_LOCAL_COMMON/$cdnfile"
+    fi
   done < "$BOOTSTRAP_REGISTRY"
 
   _bootstrap_echo "All _common files downloaded"
