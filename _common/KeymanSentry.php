@@ -15,10 +15,16 @@
       ]);
     }
 
-    static function GetBrowserHtml($dsn) {
+    static function GetBrowserHtml($dsn, $release = null) {
 
       $asset = Assets::Get('js/sentry.js');
       $tier = KeymanHosts::Instance()->TierName();
+
+      if(empty($release)) {
+        $release = '';
+      } else {
+        $release = `release: '$release',`;
+      }
 
       return <<<END
         <script
@@ -43,7 +49,8 @@
         <script>
           const sentryEnvironment = {
             dsn: '$dsn',
-            tier: '$tier',
+            environment: '$tier',
+            $release
           }
         </script>
         <script src="$asset"></script>
