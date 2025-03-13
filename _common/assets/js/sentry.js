@@ -7,10 +7,32 @@
   }
 
   //
+  // Tags all exceptions with the active KeymanWeb instance's metadata, if
+  // KeymanWeb is loaded. Compare against the definition in the main repo:
+  // - keymanapp/keyman/web/src/engine/sentry-manager/src/index.ts
+  //
+  // In the future we may use sentry-manager directly when it is available.
+  //
+
+  const prepareEvent = function(event) {
+    // Make sure the metadata-generation function actually exists... (14.0+)
+    try {
+      if(window.keyman?.getDebugInfo) {
+        event.extra = event.extra || {};
+        event.extra.keymanState = window.keyman.getDebugInfo();
+        event.extra.keymanHostPlatform = window.location.hostname;
+      }
+    } catch (ex) { /* Swallow any errors produced here */ }
+
+    return event;
+  };
+
+  //
   // Initialize Sentry for this site
   //
 
-  Sentry.init({
+  const options = {
+    beforeSend: prepareEvent,
     dsn: sentryEnvironment.dsn,
     integrations: [
       Sentry.httpClientIntegration(),
@@ -18,8 +40,14 @@
         levels: ['error', 'warning']
       })
     ],
-    environment: sentryEnvironment.tier,
-  });
+    environment: sentryEnvironment.environment,
+  };
+
+  if(sentryEnvironment.release) {
+    options.release = sentryEnvironment.release;
+  }
+
+  Sentry.init(options);
 
   //
   // Capture resource load errors
