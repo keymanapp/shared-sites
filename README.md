@@ -50,7 +50,7 @@ This script is not the same as the `build.sh` script on keyman.com sites.
 
 ### Preparing changes
 
-1. Asset files should be placed in `/assets`. PHP scrtipts should be placed in
+1. Asset files should be placed in `/assets`. PHP scripts should be placed in
    `/_common`. (Do not make changes in `/_common/assets`, as these files will be
    repopulated by build.sh.)
 2. Run `build.sh` after changing any files under `/_common` or `/assets`, in
