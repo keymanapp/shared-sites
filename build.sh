@@ -16,6 +16,7 @@ cd "$THIS_SCRIPT_PATH"
 #
 # TODO: we could tweak the asset management in the future to use symbolic links.
 #
+
 build_file_list() {
   local regtemp="$(mktemp)"
   local filename
