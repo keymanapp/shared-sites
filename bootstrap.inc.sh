@@ -44,6 +44,10 @@ if [[ -z ${BOOTSTRAP_CURRENT_VERSION_FILE+x} ]]; then
   readonly BOOTSTRAP_CURRENT_VERSION_FILE="$(dirname "$BOOTSTRAP")/.bootstrap-version"
 fi
 
+if [[ -z ${BOOTSTRAP_REGISTRY+x} ]]; then
+  readonly BOOTSTRAP_REGISTRY="$(dirname "$BOOTSTRAP")/.bootstrap-registry"
+fi
+
 #
 # Helper function to download a file from the shared-sites repository 'main' branch
 #
@@ -51,7 +55,7 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
+  curl -H "Cache-Control: no-cache" -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
   )
@@ -93,51 +97,31 @@ function bootstrap_configure() {
 # Download all files in _common, removing existing files
 #
 function _bootstrap_configure_common() {
-  local BOOTSTRAP_COMMON="$BOOTSTRAP_ROOT/_common"
-  local ASSET_IMGS="assets/img"
-  local ASSET_LOGOS="assets/sil-logos-2024"
-  local COMMON_FILES=(
-    builder.inc.sh
-    docker.inc.sh
-    keyman-local-ports.inc.sh
-    GFMAlerts.php
-    JsonApiFailure.php
-    KeymanHosts.php
-    KeymanSentry.php
-    KeymanVersion.php
-    MarkdownHost.php
-    ImageRandomizer.php
-  )
-  local IMG_FILES=(
-    gfmalerts.png
-  )
-  local LOGO_FILES=(
-    sil-logo-abbysinica.png
-    sil-logo-andika-v1.png
-    sil-logo-andika-v2.png
-    sil-logo-annapurna.png
-    sil-logo-tai-heritage-pro.png
-  )
-  local common_file=
-  local img_file=
+  _bootstrap_echo "Downloading bootstrap registry to $BOOTSTRAP_REGISTRY"
+  _bootstrap_download .bootstrap-registry "$BOOTSTRAP_REGISTRY"
+
+  local BOOTSTRAP_LOCAL_COMMON="$BOOTSTRAP_ROOT/_common"
 
   _bootstrap_echo "Downloading _common files"
-  rm -rf "$BOOTSTRAP_COMMON"
-  mkdir -p "$BOOTSTRAP_COMMON"
 
-  for common_file in "${COMMON_FILES[@]}"; do
-    _bootstrap_download "_common/$common_file" "$BOOTSTRAP_COMMON/$common_file"
-  done
+  rm -rf "$BOOTSTRAP_LOCAL_COMMON"
+  mkdir -p "$BOOTSTRAP_LOCAL_COMMON"
 
-  for img_file in "${IMG_FILES[@]}"; do
-    mkdir -p "$BOOTSTRAP_COMMON/$ASSET_IMGS/"
-    _bootstrap_download "_common/$ASSET_IMGS/$img_file" "$BOOTSTRAP_COMMON/$ASSET_IMGS/$img_file"
-  done
+  local filename
+  local basefile
+  local cdnfile
 
-  for logo_file in "${LOGO_FILES[@]}"; do
-    mkdir -p "$BOOTSTRAP_COMMON/$ASSET_LOGOS/"
-    _bootstrap_download "_common/$ASSET_LOGOS/$logo_file" "$BOOTSTRAP_COMMON/$ASSET_LOGOS/$logo_file"
-  done
+  while read filename; do
+    read -r basefile cdnfile <<<"$filename"
+    mkdir -p "$BOOTSTRAP_LOCAL_COMMON/$(dirname "$basefile")"
+    _bootstrap_download "_common/$basefile" "$BOOTSTRAP_LOCAL_COMMON/$basefile"
+
+    # CDN hashed filename support
+    if [[ ! -z $cdnfile ]]; then
+      mkdir -p "$BOOTSTRAP_LOCAL_COMMON/$(dirname "$cdnfile")"
+      _bootstrap_download "_common/$cdnfile" "$BOOTSTRAP_LOCAL_COMMON/$cdnfile"
+    fi
+  done < "$BOOTSTRAP_REGISTRY"
 
   _bootstrap_echo "All _common files downloaded"
 }
