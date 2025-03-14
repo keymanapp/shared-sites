@@ -83,5 +83,5 @@
     },
     true, // useCapture - necessary for resource loading errors
   );
-  console.log(`Sentry initialization complete: tier=${sentryEnvironment.tier}`);
+  console.log(`Sentry initialization complete: environment=${sentryEnvironment.environment}`);
 })();
