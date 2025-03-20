@@ -58,7 +58,7 @@ function _bootstrap_download() {
   curl -H "Cache-Control: no-cache" -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
     exit 3
-  )
+  ) || exit $?
 
 }
 
