@@ -62,7 +62,9 @@
       if(result.status < 200 || result.status > 399) {
         console.error(`Failed to load ${type} ${src}: HTTP status ${result.status} (${result.statusText})`);
       } else {
-        console.error(`Failed to load ${type} ${src}: verification attempt succeeded (${result.status}); possibly network instability?`);
+        // We'll log this locally but not to Sentry because there's nothing we
+        // can do with the result in the majority of cases
+        console.log(`Failed to load ${type} ${src}: verification attempt succeeded (${result.status}); possibly network instability?`);
       }
     } catch(e) {
       console.error(`Failed to load ${type} ${src}: error '${(e??'unknown error').toString()}'`);
