@@ -1,3 +1,8 @@
+#
+# This workflow is triggered on release events and updates the BOOTSTRAP_VERSION
+# in the build.sh files of dependent repositories, and creates a pull request
+# on each of the repositories with the updated version.
+#
 name: Update shared-sites dependent website repositories on release
 
 on:
@@ -32,13 +37,17 @@ jobs:
             "keymanapp/keymanweb.com"
             "keymanapp/s.keyman.com"
           )
+          mkdir -p keymanapp
+          cd keymanapp
           for repo in "${repositories[@]}"; do
             git clone "https://github.com/$repo.git"
           done
+          cd ..
 
       - name: Update build.sh files
         run: |
-          for repo in keymanapp/*; do
+          cd keymanapp
+          for repo in *; do
             cd "$repo"
             if [ -f build.sh ]; then
               sed -i "s/^readonly BOOTSTRAP_VERSION=.*/readonly BOOTSTRAP_VERSION=${BOOTSTRAP_VERSION}/" build.sh
