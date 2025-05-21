@@ -21,8 +21,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "keyman-server"
+          git config --global user.email "server@keyman.com"
 
       - name: Extract release version
         id: extract_version
@@ -61,4 +61,7 @@ jobs:
             cd ..
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # We must use a token with broader scope to write to
+          # other repositories in the org. Default GHA GITHUB_TOKEN
+          # is constrained to the current repository.
+          GITHUB_TOKEN: ${{ secrets.KEYMAN_SERVER_PAT }}
