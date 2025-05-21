@@ -146,21 +146,6 @@ function _bootstrap_new_version_requested() {
   return 1
 }
 
-# Test if resources need to be downloaded
-if [[ ! -f "$BOOTSTRAP" ]] || _bootstrap_new_version_requested; then
-  _bootstrap_echo "Bootstrap required"
-  bootstrap_configure
-fi
-
-# Finally, we need to run builder.inc.sh, if it hasn't already been run
-if [[ -z ${THIS_SCRIPT_PATH+x} ]] && [[ -f "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh" ]]; then
-  source "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh"
-
-  # Bootstrapped scripts always run from their own folder (probably $REPO_ROOT),
-  # but only do this on first-run, not if re-sourced with bootstrap_configure
-  cd "$THIS_SCRIPT_PATH"
-fi
-
 
 #
 # Re-runs the specified command-line instruction up to 5 times should it fail, waiting
@@ -173,13 +158,13 @@ fi
 #
 # ### Parameters
 #   1: $@         command-line arguments
-_bootstrap_try_multiple_times ( ) {
+function _bootstrap_try_multiple_times() {
   __bootstrap_try_multiple_times 0 "$@"
 }
 
 # $1  The current retry count
 # $2+ (everything else) the command to retry should it fail
-__bootstrap_try_multiple_times ( ) {
+function __bootstrap_try_multiple_times() {
   local RETRY_MAX=5
   # in seconds
   local RETRY_MIN_WAIT=10
@@ -207,3 +192,19 @@ __bootstrap_try_multiple_times ( ) {
     __bootstrap_try_multiple_times $retryCount "$@"
   fi
 }
+
+# Test if resources need to be downloaded
+if [[ ! -f "$BOOTSTRAP" ]] || _bootstrap_new_version_requested; then
+  _bootstrap_echo "Bootstrap required"
+  bootstrap_configure
+fi
+
+# Finally, we need to run builder.inc.sh, if it hasn't already been run
+if [[ -z ${THIS_SCRIPT_PATH+x} ]] && [[ -f "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh" ]]; then
+  source "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh"
+
+  # Bootstrapped scripts always run from their own folder (probably $REPO_ROOT),
+  # but only do this on first-run, not if re-sourced with bootstrap_configure
+  cd "$THIS_SCRIPT_PATH"
+fi
+
