@@ -36,6 +36,7 @@ jobs:
             "keymanapp/keyman.com"
             "keymanapp/keymanweb.com"
             "keymanapp/s.keyman.com"
+            "keymanapp/website-local-proxy"
           )
           mkdir -p keymanapp
           cd keymanapp
