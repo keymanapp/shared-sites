@@ -101,7 +101,7 @@ function bootstrap_configure() {
 #
 function _bootstrap_configure_common() {
   _bootstrap_echo "Downloading bootstrap registry to $BOOTSTRAP_REGISTRY"
-   _bootstrap_download .bootstrap-registry "$BOOTSTRAP_REGISTRY"
+  _bootstrap_download .bootstrap-registry "$BOOTSTRAP_REGISTRY"
 
   local BOOTSTRAP_LOCAL_COMMON="$BOOTSTRAP_ROOT/_common"
 
