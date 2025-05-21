@@ -55,6 +55,7 @@ jobs:
               git checkout -b update-bootstrap-version
               git add build.sh
               git commit -m "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}"
+              git remote set-url --push origin "https://keyman-server:${GITHUB_TOKEN}@github.com/$repo.git"
               git push -u origin update-bootstrap-version
               gh pr create --title "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}" --body "This PR updates the BOOTSTRAP_VERSION in build.sh to ${BOOTSTRAP_VERSION}." --repo "${PWD##*/}"
             fi
