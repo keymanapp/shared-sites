@@ -55,8 +55,11 @@ function _bootstrap_download() {
   local remote_file="$1"
   local local_file="$2"
   _bootstrap_echo "  Downloading $remote_file"
-  curl -H "Cache-Control: no-cache" -fs "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
+
+  _bootstrap_try_multiple_times curl -H "Cache-Control: no-cache" -f --no-progress-meter "https://raw.githubusercontent.com/keymanapp/shared-sites/$BOOTSTRAP_VERSION/$remote_file" -o "$local_file" || (
     _bootstrap_echo "FATAL: Failed to download $remote_file"
+    _bootstrap_echo "Note: removing $BOOTSTRAP_CURRENT_VERSION_FILE to force bootstrap on next run"
+    rm -f "$BOOTSTRAP_CURRENT_VERSION_FILE"
     exit 3
   ) || exit $?
 
@@ -157,3 +160,50 @@ if [[ -z ${THIS_SCRIPT_PATH+x} ]] && [[ -f "$(dirname "$THIS_SCRIPT")/_common/bu
   # but only do this on first-run, not if re-sourced with bootstrap_configure
   cd "$THIS_SCRIPT_PATH"
 fi
+
+
+#
+# Re-runs the specified command-line instruction up to 5 times should it fail, waiting
+# 10 seconds between each attempt.  No re-runs are attempted after successful commands.
+#
+# Note: from shellHelperFunctions.sh in keymanapp/keyman
+#
+# ### Usage
+#   _bootstrap_try_multiple_times command [param1 param2...]
+#
+# ### Parameters
+#   1: $@         command-line arguments
+_bootstrap_try_multiple_times ( ) {
+  __bootstrap_try_multiple_times 0 "$@"
+}
+
+# $1  The current retry count
+# $2+ (everything else) the command to retry should it fail
+__bootstrap_try_multiple_times ( ) {
+  local RETRY_MAX=5
+  # in seconds
+  local RETRY_MIN_WAIT=10
+
+  local retryCount=$1
+  shift
+
+  if (( "$retryCount" == "$RETRY_MAX" )); then
+    echo 2>&1 "Retry limit of $RETRY_MAX attempts reached."
+    return 1
+  fi
+
+  retryCount=$(( $retryCount + 1 ))
+
+  if (( $retryCount != 1 )); then
+    echo 2>&1 "Delaying $RETRY_MIN_WAIT seconds before attempt $retryCount:"
+    echo 2>&1 "    $@"
+    sleep $RETRY_MIN_WAIT
+  fi
+
+  local code=0
+  "$@" || code=$?
+  if (( $code != 0 )); then
+    echo 2>&1 "Command failed with error $code"
+    __bootstrap_try_multiple_times $retryCount "$@"
+  fi
+}
