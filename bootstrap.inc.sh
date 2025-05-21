@@ -80,7 +80,7 @@ function _bootstrap_echo() {
 #
 function bootstrap_configure() {
   _bootstrap_echo "Bootstrap starting"
-   _bootstrap_download bootstrap.inc.sh "$BOOTSTRAP"
+  _bootstrap_download bootstrap.inc.sh "$BOOTSTRAP"
 
   # Record the version we downloaded -- before we re-source the script!
   echo $BOOTSTRAP_VERSION > "$BOOTSTRAP_CURRENT_VERSION_FILE"
