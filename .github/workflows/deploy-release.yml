@@ -1,0 +1,54 @@
+name: Update shared-sites dependent website repositories on release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  update-repositories:
+    name: Update dependent website repositories on release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Extract release version
+        id: extract_version
+        run: echo "BOOTSTRAP_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Clone target repositories
+        run: |
+          repositories=(
+            "keymanapp/api.keyman.com"
+            "keymanapp/help.keyman.com"
+            "keymanapp/keyman.com"
+            "keymanapp/keymanweb.com"
+            "keymanapp/s.keyman.com"
+          )
+          for repo in "${repositories[@]}"; do
+            git clone "https://github.com/$repo.git"
+          done
+
+      - name: Update build.sh files
+        run: |
+          for repo in keymanapp/*; do
+            cd "$repo"
+            if [ -f build.sh ]; then
+              sed -i "s/^readonly BOOTSTRAP_VERSION=.*/readonly BOOTSTRAP_VERSION=${BOOTSTRAP_VERSION}/" build.sh
+              git checkout -b update-bootstrap-version
+              git add build.sh
+              git commit -m "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}"
+              git push -u origin update-bootstrap-version
+              gh pr create --title "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}" --body "This PR updates the BOOTSTRAP_VERSION in build.sh to ${BOOTSTRAP_VERSION}." --repo "${PWD##*/}"
+            fi
+            cd ..
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
