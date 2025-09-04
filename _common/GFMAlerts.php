@@ -83,6 +83,7 @@ class GFMAlerts extends ParsedownExtra
         // Continue the Alerts, Formatting: > Content, append a paragraph
         $block['element']['text'][] = [
             'name' => 'p',
+            'handler' => 'line',
             'text' => $matches[1],
         ];
 
