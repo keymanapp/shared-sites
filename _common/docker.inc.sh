@@ -18,7 +18,7 @@ function stop_docker_container() {
   if [ ! -z "$CONTAINER_ID" ]; then
     docker container stop $CONTAINER_ID
   else
-    echo "No Docker container to stop"
+    builder_echo "No Docker container to stop"
   fi
 }
 
@@ -81,12 +81,14 @@ function start_docker_container() {
 
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
   if [ ! -z "$CONTAINER_ID" ]; then
-    builder_die "$HOST container $CONTAINER_ID has already been started"
+    builder_echo green "Container $CONTAINER_ID has already been started, listening on http://$HOST:$PORT"
   fi
 
   # Start the Docker container
   if [ -z $(get_docker_image_id $IMAGE_NAME) ]; then
-    builder_die "ERROR: Docker container doesn't exist. Run \"./build.sh build\" first"
+    builder_echo yellow "Docker container doesn't exist. Running \"./build.sh build\" first"
+    "$THIS_SCRIPT" build
+    builder_echo green "Docker container created successfully"
   fi
 
   if [[ $OSTYPE =~ msys|cygwin ]]; then
