@@ -30,14 +30,7 @@ jobs:
 
       - name: Clone target repositories
         run: |
-          repositories=(
-            "keymanapp/api.keyman.com"
-            "keymanapp/help.keyman.com"
-            "keymanapp/keyman.com"
-            "keymanapp/keymanweb.com"
-            "keymanapp/s.keyman.com"
-            "keymanapp/website-local-proxy"
-          )
+          . sites.inc.sh
           mkdir -p keymanapp
           cd keymanapp
           for repo in "${repositories[@]}"; do
