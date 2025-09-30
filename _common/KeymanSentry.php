@@ -26,9 +26,18 @@
         $release = `release: '$release',`;
       }
 
+      // Parse out the DSN short string from DSN like:
+      // 'https://44d5544d7c45466ba1928b9196faf67e@o1005580.ingest.sentry.io/5983516'
+      // (this one was for keyman.com)
+      if(!preg_match('/\/\/(.+)@/', $dsn, $matches)) {
+        // invalid sentry DSN, so just don't load Sentry on client
+        return '';
+      }
+      $dsn_id = $matches[1];
+
       return <<<END
         <script
-          src="https://js.sentry-cdn.com/bba22972ad6b4c2ab03a056f549cc23d.min.js"
+          src="https://js.sentry-cdn.com/$dsn_id.min.js"
           crossorigin="anonymous"
         ></script>
         <script
