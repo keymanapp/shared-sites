@@ -83,6 +83,36 @@
       return $contents;
     }
 
+    /**
+     * Return a Javascript snippet that defines the Keyman website hostnames for
+     * the current environment, which should be injected into a SCRIPT element
+     * near the top of the document.
+     */
+    public function emitJavascriptConst() {
+      echo <<<END
+        const keymanHosts = {
+          ['s.keyman.com']: "$this->s_keyman_com",
+          ['api.keyman.com']: "$this->api_keyman_com",
+          ['help.keyman.com']: "$this->help_keyman_com",
+          ['keyman.com']: "$this->keyman_com",
+          ['keymanweb.com']: "$this->keymanweb_com",
+          ['downloads.keyman.com']: "$this->downloads_keyman_com",
+          ['blog.keyman.com']: "$this->blog_keyman_com",
+          ['translate.keyman.com']: "$this->translate_keyman_com",
+          ['r.keymanweb.com']: "$this->r_keymanweb_com",
+          s: "$this->s_keyman_com",
+          api: "$this->api_keyman_com",
+          help: "$this->help_keyman_com",
+          keyman: "$this->keyman_com",
+          keymanweb: "$this->keymanweb_com",
+          downloads: "$this->downloads_keyman_com",
+          blog: "$this->blog_keyman_com",
+          translate: "$this->translate_keyman_com",
+          r_keymanweb: "$this->r_keymanweb_com",
+        };
+END;
+    }
+
     public function overrideHost($host, $value) {
       if(empty($this->$host)) {
         // If there's no value set, then we must be overriding something invalid
