@@ -1,6 +1,56 @@
 # shared-sites
 
-Shared content across keyman.com sites
+Shared content across keyman.com sites and centralized management of website
+launch and configuration.
+
+## Centralized management of keyman.com sites
+
+The local build.sh script allows you to clone, build, start, stop, and test
+all keyman.com sites with a single command.
+
+The repositories are assumed to be in subfolders of the parent folder for
+this repo, for example, the following folder layout is suggested:
+
+```
+/.../projects/keyman/
+  sites/
+    api.keyman.com/
+    keyman.com/
+    ...
+    shared-sites/
+    website-local-proxy/
+```
+
+To see the full list of commands and repositories, run:
+
+```sh
+./build.sh --help
+```
+
+Some common commands are:
+
+```sh
+./build.sh clone      # Clone websites from GitHub into subfolders of parent folder
+./build.sh pull       # Switch to master and pull latest changes to websites, DELETES MERGED BRANCHES
+./build.sh configure  # Configure websites
+./build.sh clean      # Clean websites
+./build.sh build      # Build docker images
+./build.sh start      # Start Docker containers
+./build.sh stop       # Stop Docker containers
+./build.sh test       # Test websites
+```
+
+These commands can be combined, e.g.
+
+```sh
+./build.sh configure,build,start,test
+```
+
+And can be limited to specific repos, e.g.:
+
+```sh
+./build.sh build,start:keyman.com,keymanweb.com
+```
 
 ## Shared content
 
@@ -46,6 +96,12 @@ keyman.com sites. It rebuilds the `/_common/assets` folder and creates the
 `.bootstrap-registry` file.
 
 This script is not the same as the `build.sh` script on keyman.com sites.
+
+The command to run is:
+
+```sh
+./build.sh build-files
+```
 
 ## Distribution of changes
 
