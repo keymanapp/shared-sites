@@ -82,6 +82,7 @@ function start_docker_container() {
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
   if [ ! -z "$CONTAINER_ID" ]; then
     builder_echo green "Container $CONTAINER_ID has already been started, listening on http://$HOST:$PORT"
+    return 0
   fi
 
   # Start the Docker container
