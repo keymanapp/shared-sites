@@ -53,11 +53,15 @@ function _verify_vendor_is_not_folder() {
 function build_docker_container() {
   local IMAGE_NAME=$1
   local CONTAINER_NAME=$2
+  local BUILDER_CONFIGURATION="release"
+  if [[ $# -eq 3 ]]; then
+    BUILDER_CONFIGURATION=$3
+  fi
 
   _verify_vendor_is_not_folder
 
   # Download docker image. --mount option requires BuildKit
-  DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME .
+  DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" .
 }
 
 function start_docker_container() {
