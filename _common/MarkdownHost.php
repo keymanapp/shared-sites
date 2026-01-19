@@ -6,7 +6,7 @@
   use Keyman\Site\Common\KeymanHosts;
 
   class MarkdownHost {
-    private $content, $pagetitle, $showMenu, $pagedescription;
+    private $content, $pagetitle, $showMenu, $pagedescription, $cdn;
 
     function PageTitle() {
       return $this->pagetitle;
@@ -96,13 +96,65 @@
       // Performs the parsing + alerts + prettification of Markdown for display through PHP.
       $ParsedownAndAlerts = new \Keyman\Site\Common\GFMAlerts();
 
+      // Fixup CDN references in source .md content
+      $contents = $this->replaceCdnPaths($contents);
+
       // Does the magic.
-       
-       $this->content = 
-       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" . 
-       "<div class='markdown'>" . 
-       $ParsedownAndAlerts->text($contents) . 
+
+       $this->content =
+       "<h1>" . htmlentities($this->pagetitle) . "</h1>\n" .
+       "<div class='markdown'>" .
+       $ParsedownAndAlerts->text($contents) .
        "</div>";
     }
+
+    /**
+     * cdn text replacement: Replace the partial Markdown reference
+     * to a URL in '/cdn/dev/(filename.ext)' with corresponding
+     * '/cdn/deploy/(filename.hash.ext)'
+     */
+    private function replaceCdnPaths($contents) {
+      return preg_replace_callback('/(\/cdn\/dev\/)([^) \'"]+)/', function($matches) {
+        return $this->cdn($matches[2]);
+      }, $contents);
+    }
+
+    /**
+     * Map a /cdn/dev path to the corresponding /cdn/deploy path, on production
+     * and staging sites. Continues to use /cdn/dev for local and test sites.
+     *
+     * Note that there is also a site-local cdn() function, often in a Util.php
+     * file, which is used for legacy .php pages.
+     *
+     * This function depends on the /cdn/deploy/cdn.php path not changing.
+     *
+     * TODO: merge this cdn() function with Util::cdn() across all sites that
+     *       use Markdown.
+     */
+    private function cdn($file) {
+      if(!isset($this->cdn)) {
+        if(
+          (KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_PRODUCTION ||
+          KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_STAGING) &&
+          !empty($_SERVER['DOCUMENT_ROOT']) &&
+          file_exists($_SERVER['DOCUMENT_ROOT'].'/cdn/deploy/cdn.php')
+        ) {
+          require($_SERVER['DOCUMENT_ROOT'].'/cdn/deploy/cdn.php');
+          $this->cdn = $cdn;
+        } else {
+          $this->cdn = false;
+        }
+      }
+
+      if(!empty($this->cdn)) {
+        if(isset($this->cdn['/'.$file])) {
+          return "/cdn/deploy{$this->cdn['/'.$file]}";
+        }
+        // TODO: log warning or error to sentry on missing files
+      }
+
+      return "/cdn/dev/{$file}";
+    }
+
   }
 
