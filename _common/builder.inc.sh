@@ -2300,6 +2300,7 @@ builder_is_linux() {
 #
 _builder_get_operating_system() {
   declare -g BUILDER_OS
+  # Note: on macOS, bash version 4 or above is needed for `declare -g`.
 
   if builder_is_macos; then
     BUILDER_OS=mac
