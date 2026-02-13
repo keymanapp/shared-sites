@@ -54,14 +54,21 @@ function build_docker_container() {
   local IMAGE_NAME=$1
   local CONTAINER_NAME=$2
   local BUILDER_CONFIGURATION="release"
-  if [[ $# -eq 3 ]]; then
+  local TARGET=.
+  if [[ $# -ge 3 ]]; then
     BUILDER_CONFIGURATION=$3
+  fi
+  if [[ $# -ge 4 ]]; then
+    TARGET="-f $4 ."
   fi
 
   _verify_vendor_is_not_folder
 
+  builder_echo "Building using $BUILDER_CONFIGURATION configuration"
+
+
   # Download docker image. --mount option requires BuildKit
-  DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" .
+  DOCKER_BUILDKIT=1 docker build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" $TARGET
 }
 
 function start_docker_container() {
@@ -77,10 +84,14 @@ function start_docker_container() {
 
   _verify_vendor_is_not_folder
 
+  builder_echo "Starting using $BUILDER_CONFIGURATION configuration"
+
   if [[ $BUILDER_CONFIGURATION =~ debug ]]; then
     touch _control/debug
+    rm -f _control/release
   else
     rm -f _control/debug
+    touch _control/release
   fi
 
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
@@ -96,11 +107,13 @@ function start_docker_container() {
     builder_echo green "Docker container created successfully"
   fi
 
-  if [[ $OSTYPE =~ msys|cygwin ]]; then
-    # Windows needs leading slashes for path
-    SITE_HTML="//$(pwd):/var/www/html/"
-  else
-    SITE_HTML="$(pwd):/var/www/html/"
+  if [ -z "${DOCKER_BINDING+x}" ]; then
+    if [[ $OSTYPE =~ msys|cygwin ]]; then
+      # Windows needs leading slashes for path
+      DOCKER_BINDING="//$(pwd):/var/www/html/"
+    else
+      DOCKER_BINDING="$(pwd):/var/www/html/"
+    fi
   fi
 
   ADD_HOST=
@@ -109,7 +122,7 @@ function start_docker_container() {
     ADD_HOST="--add-host host.docker.internal:host-gateway"
   fi
 
-  docker run --rm -d -p $PORT:80 -v "${SITE_HTML}" \
+  docker run --rm -d -p $PORT:80 -v "${DOCKER_BINDING}" \
     -e S_KEYMAN_COM=localhost:$PORT_S_KEYMAN_COM \
     -e API_KEYMAN_COM=localhost:$PORT_API_KEYMAN_COM \
     --name $CONTAINER_DESC \
@@ -117,7 +130,7 @@ function start_docker_container() {
     $CONTAINER_NAME
 
   # Skip if link already exists
-  if [ ! -L vendor ]; then
+  if [ ! -L vendor ] && [ -f composer.json ]; then
     # Create link to vendor/ folder
     CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
     if [ -z "$CONTAINER_ID" ]; then
