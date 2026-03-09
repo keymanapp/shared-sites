@@ -59,7 +59,7 @@
       $lines = explode("\n", $contents);
       $headers = [];
 
-      $found = count($lines) > 3 && rtrim($lines[0]) == '---';
+      $found = count($lines) > 2 && rtrim($lines[0]) == '---';
       if($found) {
         for($i = 1; $i < count($lines); $i++) {
           if($lines[$i] == '---') break;
