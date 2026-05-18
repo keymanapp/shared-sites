@@ -206,6 +206,19 @@ if [[ ! -f "$BOOTSTRAP" ]] || _bootstrap_new_version_requested; then
   bootstrap_configure
 fi
 
+# Get the site BUILDER_TIER and use that to determine builder script environment
+if [[ ! -z ${KEYMANHOSTS_TIER+x} ]]; then
+  BUILDER_TIER="${KEYMANHOSTS_TIER}"
+elif [[ -f "$(dirname "$THIS_SCRIPT")/tier.txt" ]]; then
+  BUILDER_TIER=$(cat "$(dirname "$THIS_SCRIPT")/tier.txt")
+else
+  BUILDER_TIER=TIER_DEVELOPMENT
+fi
+
+if [[ "$BUILDER_TIER" == TIER_DEVELOPMENT ]]; then
+  export KEYMAN_VERSION_ENVIRONMENT=local
+fi
+
 # Finally, we need to run builder.inc.sh, if it hasn't already been run
 if [[ -z ${THIS_SCRIPT_PATH+x} ]] && [[ -f "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh" ]]; then
   source "$(dirname "$THIS_SCRIPT")/_common/builder.inc.sh"
