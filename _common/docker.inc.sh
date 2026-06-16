@@ -1,4 +1,11 @@
-# Common docker functions.
+# shellcheck shell=bash
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Common docker functions for (generally PHP-based) containers
+#
+
+source _common/tests.inc.sh
 
 function get_docker_image_id() {
   local IMAGE_NAME=$1
@@ -153,4 +160,53 @@ function start_docker_container() {
   fi
 
   builder_echo green "Listening on http://$HOST:$PORT"
+}
+
+#
+# Test PHP site in a docker container
+#
+# Parameters:
+#   1: CONTAINER_DESC    desc of container to test
+#   2: CONTAINER_PORT    localhost http port for container
+#   3: TEST_PATH         path to start link check at, under http://localhost:CONTAINER_PORT
+#   4..: SKIP_PATHS      paths to skip crawling in link check, optional
+#
+# Builder options --no-unit-test, --no-lint, --no-link-check are honoured
+#
+function test_docker_container() {
+  local CONTAINER_DESC="$1"
+  local CONTAINER_PORT="$2"
+  local TEST_PATH="$3"
+  shift 3
+  local SKIP_PATHS=("$@")
+
+  local LINK_RESULT=0
+  echo "TIER_TEST" > tier.txt
+
+  # Similar pattern in ci.yml on sites
+
+  do_test_record_start_time
+
+  if ! builder_has_option --no-unit-test; then
+    builder_echo blue "---- PHP unit tests"
+    do_test_unit_tests "${CONTAINER_DESC}"
+  fi
+
+  if ! builder_has_option --no-lint; then
+    builder_echo blue "---- Lint PHP files"
+    do_test_lint "${CONTAINER_DESC}"
+  fi
+
+  if ! builder_has_option --no-link-check; then
+    builder_echo blue "---- Testing links"
+
+    do_test_links "http://localhost:${CONTAINER_PORT}" "$TEST_PATH" "${SKIP_PATHS[@]}" || LINK_RESULT=$?
+    builder_echo blue "Done checking links; linkinator exit code: ${LINK_RESULT}"
+    do_test_print_link_report
+
+    do_test_print_container_error_logs "${CONTAINER_DESC}"
+  fi
+
+  rm tier.txt
+  return "$LINK_RESULT"
 }
