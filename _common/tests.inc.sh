@@ -1,4 +1,9 @@
 # shellcheck shell=bash
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Shared test functions for PHP lint, unit test, and general broken link checks
+#
 
 # Record the start time for unit tests for later log review
 function do_test_record_start_time() {
@@ -36,12 +41,8 @@ function do_test_links() {
   local baseURL="$1"
   local testPath="$2"
   shift 2
-  local skipPaths skip skipParams=()
-  if [[ $# -gt 1 ]]; then
-    skipPaths=("$*")
-  else
-    skipPaths=()
-  fi
+  local skipPaths=("$@")
+  local skip skipParams=()
 
   for skip in "${skipPaths[@]}"; do
     skipParams+=(--skip "^${baseURL}${skip}")
@@ -75,16 +76,16 @@ function do_test_print_link_report() {
 }
 
 # Scan logs recorded on container since start of tests to find any reported PHP
-# errors (note, depends on 'php7' string)
+# errors (note, depends on '[php#:xxxx]' marker string, where # = 7 for PHP7, omitted for PHP8)
 #
 # Parameters
 # 1: CONTAINER     container_desc to run on
 #
 function do_test_print_container_error_logs() {
   local CONTAINER="$1"
-  if docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep -q 'php7'; then
+  if docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep -qP '\[php7?:(error|warn|notice)\]'; then
     echo 'PHP reported errors or warnings:'
-    docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep 'php7'
+    docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep -P '\[php7?:(error|warn|notice)\]'
     return 1
   else
     echo 'No PHP errors found'

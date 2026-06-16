@@ -1,4 +1,9 @@
-# Common docker functions.
+# shellcheck shell=bash
+#
+# Keyman is copyright (C) SIL Global. MIT License.
+#
+# Common docker functions for (generally PHP-based) containers
+#
 
 source _common/tests.inc.sh
 
@@ -173,12 +178,12 @@ function test_docker_container() {
   local CONTAINER_PORT="$2"
   local TEST_PATH="$3"
   shift 3
-  local SKIP_PATHS=("$*")
+  local SKIP_PATHS=("$@")
 
-  local LINK_RESULT
+  local LINK_RESULT=0
   echo "TIER_TEST" > tier.txt
 
-  # from commands.inc.sh
+  # Similar pattern in ci.yml on sites
 
   do_test_record_start_time
 
@@ -195,7 +200,6 @@ function test_docker_container() {
   if ! builder_has_option --no-link-check; then
     builder_echo blue "---- Testing links"
 
-    LINK_RESULT=0
     do_test_links "http://localhost:${CONTAINER_PORT}" "$TEST_PATH" "${SKIP_PATHS[@]}" || LINK_RESULT=$?
     builder_echo blue "Done checking links; linkinator exit code: ${LINK_RESULT}"
     do_test_print_link_report
