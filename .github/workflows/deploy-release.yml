@@ -43,15 +43,14 @@ jobs:
           cd keymanapp
           for repo in *; do
             cd "$repo"
-            if [ -f build.sh ]; then
-              sed -i "s/^readonly BOOTSTRAP_VERSION=.*/readonly BOOTSTRAP_VERSION=${BOOTSTRAP_VERSION}/" build.sh
-              git checkout -b auto/update-bootstrap-version-${BOOTSTRAP_VERSION}
-              git add build.sh
-              git commit -m "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}"
-              git remote set-url --push origin "https://keyman-server:${GITHUB_TOKEN}@github.com/keymanapp/$repo.git"
-              git push -u origin auto/update-bootstrap-version-${BOOTSTRAP_VERSION}
-              gh pr create --title "auto: update shared-sites version to ${BOOTSTRAP_VERSION}" --label auto --reviewer darcywong00,mcdurdin,ermshiperete --body "Update BOOTSTRAP_VERSION to [${BOOTSTRAP_VERSION}](https://github.com/keymanapp/shared-sites/releases/tag/${BOOTSTRAP_VERSION})." --repo "keymanapp/${PWD##*/}"
-            fi
+            mkdir -p resources
+            echo "${BOOTSTRAP_VERSION}" > resources/.bootstrap-required-version
+            git checkout -b auto/update-bootstrap-version-${BOOTSTRAP_VERSION}
+            git add resources/.bootstrap-required-version
+            git commit -m "chore: update BOOTSTRAP_VERSION to ${BOOTSTRAP_VERSION}"
+            git remote set-url --push origin "https://keyman-server:${GITHUB_TOKEN}@github.com/keymanapp/$repo.git"
+            git push -u origin auto/update-bootstrap-version-${BOOTSTRAP_VERSION}
+            gh pr create --title "auto: update shared-sites version to ${BOOTSTRAP_VERSION}" --label auto --body "Update BOOTSTRAP_VERSION to [${BOOTSTRAP_VERSION}](https://github.com/keymanapp/shared-sites/releases/tag/${BOOTSTRAP_VERSION})." --repo "keymanapp/${PWD##*/}"
             cd ..
           done
         env:
