@@ -1,3 +1,5 @@
+TEST
+
 # shared-sites
 
 Shared content across keyman.com sites and centralized management of website
