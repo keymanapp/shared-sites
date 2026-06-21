@@ -2,12 +2,12 @@
 
 function get_docker_image_id() {
   local IMAGE_NAME=$1
-  echo "$($BUILDER_ENGINE images -q $IMAGE_NAME)"
+  echo "$($CONTAINER_ENGINE images -q $IMAGE_NAME)"
 }
 
 function get_docker_container_id() {
   local CONTAINER_NAME=$1
-  echo "$($BUILDER_ENGINE ps -a -q --filter ancestor=$CONTAINER_NAME)"
+  echo "$($CONTAINER_ENGINE ps -a -q --filter ancestor=$CONTAINER_NAME)"
 }
 
 function stop_docker_container() {
@@ -16,7 +16,7 @@ function stop_docker_container() {
 
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
   if [ ! -z "$CONTAINER_ID" ]; then
-    $BUILDER_ENGINE container stop $CONTAINER_ID
+    $CONTAINER_ENGINE container stop $CONTAINER_ID
   else
     builder_echo "No Docker container to stop"
   fi
@@ -31,14 +31,14 @@ function clean_docker_container() {
 
   local CONTAINER_ID=$(get_docker_container_id $CONTAINER_NAME)
   if [ ! -z "$CONTAINER_ID" ]; then
-    $BUILDER_ENGINE container rm $CONTAINER_ID
+    $CONTAINER_ENGINE container rm $CONTAINER_ID
   else
     echo "No Docker container to clean"
   fi
 
   local IMAGE_ID=$(get_docker_image_id $IMAGE_NAME)
   if [ ! -z "$IMAGE_ID" ]; then
-    $BUILDER_ENGINE rmi $IMAGE_NAME
+    $CONTAINER_ENGINE rmi $IMAGE_NAME
   else
     echo "No Docker image to clean"
   fi
@@ -56,7 +56,6 @@ function build_docker_container() {
   local BUILDER_CONFIGURATION="release"
   local FILE=
   local TARGET=.
-  echo $CONTAINER_ENGINE
   if [[ $# -ge 3 ]]; then
     BUILDER_CONFIGURATION=$3
   fi
@@ -73,7 +72,7 @@ function build_docker_container() {
   builder_echo "Building using $BUILDER_CONFIGURATION configuration"
 
   # Download docker image. --mount option requires BuildKit
-  DOCKER_BUILDKIT=1 $BUILDER_ENGINE build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" $FILE $TARGET
+  DOCKER_BUILDKIT=1 $CONTAINER_ENGINE build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" $FILE $TARGET
 }
 
 function start_docker_container() {
@@ -127,7 +126,7 @@ function start_docker_container() {
     ADD_HOST="--add-host host.docker.internal:host-gateway"
   fi
 
-  $BUILDER_ENGINE run --rm -d -p $PORT:80 -v "${DOCKER_BINDING}" \
+  $CONTAINER_ENGINE run --rm -d -p $PORT:80 -v "${DOCKER_BINDING}" \
     -e S_KEYMAN_COM=localhost:$PORT_S_KEYMAN_COM \
     -e API_KEYMAN_COM=localhost:$PORT_API_KEYMAN_COM \
     --name $CONTAINER_DESC \
@@ -142,7 +141,7 @@ function start_docker_container() {
       builder_die "Docker container appears to have failed to start in order to create link to vendor/"
     fi
 
-    $BUILDER_ENGINE exec -i $CONTAINER_ID sh -c "ln -s /var/www/vendor vendor && chown -R www-data:www-data vendor"
+    $CONTAINER_ENGINE exec -i $CONTAINER_ID sh -c "ln -s /var/www/vendor vendor && chown -R www-data:www-data vendor"
   fi
 
   # after starting container, we want to run an init script if it is present
@@ -154,7 +153,7 @@ function start_docker_container() {
 
     cmd="./resources/init-container.sh ${BUILDER_CONFIGURATION}"
     builder_echo green "cmd is ${cmd}"
-    $BUILDER_ENGINE exec -i $CONTAINER_ID sh -c "${cmd}"
+    $CONTAINER_ENGINE exec -i $CONTAINER_ID sh -c "${cmd}"
   fi
 
   builder_echo green "Listening on http://$HOST:$PORT"
@@ -171,11 +170,11 @@ _is_container_engine() {
 }
 
 _get_container_engine() {
-  export BUILDER_ENGINE
+  export CONTAINER_ENGINE
   if _is_container_engine "docker"; then
-    BUILDER_ENGINE="docker"
+    CONTAINER_ENGINE="docker"
   elif _is_container_engine "podman"; then
-    BUILDER_ENGINE="podman"
+    CONTAINER_ENGINE="podman"
   else
     builder_die "No supported container engine found. Please install Docker or Podman to run containerized builds."
   fi
@@ -186,4 +185,4 @@ _get_container_engine() {
 ################################################################################
 
 _get_container_engine
-builder_echo "Using container engine: $BUILDER_ENGINE"
+builder_echo "Using container engine: $CONTAINER_ENGINE"
