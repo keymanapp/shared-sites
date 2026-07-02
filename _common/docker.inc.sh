@@ -232,10 +232,16 @@ _get_container_engine() {
   export CONTAINER_ENGINE
   if _is_container_engine "docker"; then
     CONTAINER_ENGINE="docker"
+    builder_echo "Using container engine: $CONTAINER_ENGINE"
   elif _is_container_engine "podman"; then
     CONTAINER_ENGINE="podman"
+    builder_echo "Using container engine: $CONTAINER_ENGINE"
   else
-    builder_die "No supported container engine found. Please install Docker or Podman to run containerized builds."
+    # deployment uses k8s, not docker or podman, so we don't want to kill the
+    # script here, just emit a warning
+    builder_echo warning "No supported container engine found. Please install Docker or Podman to run containerized builds."
+    # Use `docker` so that calls to CONTAINER_ENGINE make sense even when they fail
+    CONTAINER_ENGINE="docker"
   fi
 }
 
@@ -244,4 +250,4 @@ _get_container_engine() {
 ################################################################################
 
 _get_container_engine
-builder_echo "Using container engine: $CONTAINER_ENGINE"
+
