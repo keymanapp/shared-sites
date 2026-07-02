@@ -7,11 +7,33 @@
   require_once __DIR__ . '/KeymanHosts.php';
   require_once __DIR__ . '/Assets.php';
 
+  if(KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_DEVELOPMENT ||
+     KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_TEST) {
+    // For testing broken pages, we want to send HTTP 500 so that
+    // broken-link-checker will report it; in order to do this we
+    // need to cache the page output so that headers are not sent
+    // too early
+    ob_start();
+  }
+
   class KeymanSentry {
     static function init($dsn) {
       \Sentry\init([
         'dsn' => $dsn,
-        'environment' => KeymanHosts::Instance()->TierName()
+        'environment' => KeymanHosts::Instance()->TierName(),
+        'before_send' => function (\Sentry\Event $event) {
+          // Don't send events from localhost or dev environments
+          if (KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_DEVELOPMENT ||
+              KeymanHosts::Instance()->Tier() == KeymanHosts::TIER_TEST) {
+             if(headers_sent()) {
+              echo "<p>Fatal error: not setting 500 because headers already sent.</p>";
+             } else {
+              header("HTTP/1.1 500 Internal Server Error");
+             }
+            return null;
+          }
+          return $event;
+        },
       ]);
     }
 

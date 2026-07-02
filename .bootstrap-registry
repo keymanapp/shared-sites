@@ -20,3 +20,4 @@ KeymanHosts.php
 KeymanSentry.php
 KeymanVersion.php
 MarkdownHost.php
+tests.inc.sh
