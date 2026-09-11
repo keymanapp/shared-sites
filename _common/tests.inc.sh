@@ -33,7 +33,7 @@ function do_test_lint() {
 ## Check links on live local server using linkinator
 #
 # Parameters
-# 1:       baseURL     the top level URL for the site
+# 1:       baseURL     the top level URL for the site, e.g. http://localhost:8053 (no terminating slash)
 # 2:       testPath    path under baseURL to start testing, e.g. /
 # 3[,4..]: skipPaths   list of paths (under baseURL) to skip crawling, optional
 #
@@ -47,6 +47,8 @@ function do_test_links() {
   for skip in "${skipPaths[@]}"; do
     skipParams+=(--skip "^${baseURL}${skip}")
   done
+
+  builder_echo "Testing links; --skip ^(?!${baseURL}) ${skipParams[*]}"
 
   npx https://github.com/keymanapp/linkinator \
     "${baseURL}${testPath}" \
@@ -76,19 +78,25 @@ function do_test_print_link_report() {
 }
 
 # Scan logs recorded on container since start of tests to find any reported PHP
-# errors (note, depends on '[php#:xxxx]' marker string, where # = 7 for PHP7, omitted for PHP8)
+# errors
 #
 # Parameters
 # 1: CONTAINER     container_desc to run on
 #
 function do_test_print_container_error_logs() {
   local CONTAINER="$1"
-  if docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep -qP '\[php7?:(error|warn|notice)\]'; then
-    echo 'PHP reported errors or warnings:'
-    docker container logs "${CONTAINER}" --since "${TEST_START_TIME}" 2>&1 | grep -P '\[php7?:(error|warn|notice)\]'
-    return 1
-  else
-    echo 'No PHP errors found'
-    return 0
-  fi
+  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh report
+}
+
+
+function do_test_links_setup() {
+  local CONTAINER="$1"
+  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh setup
+  docker kill "${CONTAINER}" --signal="USR1"
+}
+
+function do_test_links_cleanup() {
+  local CONTAINER="$1"
+  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh cleanup
+  docker kill "${CONTAINER}" --signal="USR1"
 }
