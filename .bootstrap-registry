@@ -21,3 +21,4 @@ KeymanSentry.php
 KeymanVersion.php
 MarkdownHost.php
 tests.inc.sh
+tests.container.sh

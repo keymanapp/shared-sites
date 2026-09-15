@@ -81,6 +81,9 @@ function build_docker_container() {
   builder_echo "Building using $BUILDER_CONFIGURATION configuration"
 
   # Download docker image. --mount option requires BuildKit
+  #
+  # note: --no-cache may be added here if trying to replicate broken ci locally
+  #       where Docker resources have been cached
   DOCKER_BUILDKIT=1 $CONTAINER_ENGINE build -t $IMAGE_NAME --build-arg BUILDER_CONFIGURATION="${BUILDER_CONFIGURATION}" $FILE $TARGET
 }
 
@@ -188,6 +191,7 @@ function test_docker_container() {
 
   local LINK_RESULT=0
   echo "TIER_TEST" > tier.txt
+  trap _docker_cleanup_test_docker_container ERR EXIT SIGINT SIGTERM
 
   # Similar pattern in ci.yml on sites
 
@@ -206,16 +210,69 @@ function test_docker_container() {
   if ! builder_has_option --no-link-check; then
     builder_echo blue "---- Testing links"
 
+    do_test_links_setup "${CONTAINER_DESC}"
+
     do_test_links "http://localhost:${CONTAINER_PORT}" "$TEST_PATH" "${SKIP_PATHS[@]}" || LINK_RESULT=$?
     builder_echo blue "Done checking links; linkinator exit code: ${LINK_RESULT}"
     do_test_print_link_report
 
     do_test_print_container_error_logs "${CONTAINER_DESC}"
+
+    do_test_links_cleanup "${CONTAINER_DESC}"
   fi
 
   rm tier.txt
   return "$LINK_RESULT"
 }
+
+_docker_cleanup_test_docker_container() {
+  rm -f "$THIS_SCRIPT_PATH/tier.txt"
+}
+
+#
+# Setup a temporary container for interactive composer updates
+#
+function docker_build_and_start_composer_container() {
+  local COMPOSER_ID=composer-temp
+  docker build -f Dockerfile --target composer-builder --tag $COMPOSER_ID .
+
+  local DOCKER_BINDING
+  if [[ $OSTYPE =~ msys|cygwin ]]; then
+    # Windows needs leading slashes for path
+    DOCKER_BINDING="//$(pwd):/var/www/html/"
+  else
+    DOCKER_BINDING="$(pwd):/var/www/html/"
+  fi
+
+  docker run -v "$DOCKER_BINDING" --name $COMPOSER_ID --user root --rm -d $COMPOSER_ID
+
+  echo
+  echo "Some of the following commands may be helpful:"
+  echo "  docker exec $COMPOSER_ID    composer audit"
+  echo "  docker exec $COMPOSER_ID    composer update"
+  echo "  docker exec $COMPOSER_ID    composer update --lock"
+  echo "  docker exec $COMPOSER_ID    composer require package-name"
+  echo "  docker exec $COMPOSER_ID    composer require package-name --dev"
+  echo
+}
+
+#
+# Cleanup the temporary container used for interactive composer updates
+# (including copying composer files)
+#
+function docker_stop_and_cleanup_composer_container() {
+  local COMPOSER_ID=composer-temp
+  # copy modified files to mounted volume:
+  docker exec $COMPOSER_ID    cp composer.lock //var/www/html/
+  docker exec $COMPOSER_ID    cp composer.json //var/www/html/
+  # cleanup
+  docker stop $COMPOSER_ID
+  docker rmi $COMPOSER_ID
+
+  builder_echo "Copied any changes from composer.json, composer.lock from init container into repo"
+  builder_echo "Note: 'build.sh build' will be required if changes have been made to /vendor by composer"
+}
+
 
 
 # Returns 0 if the specified container engine is available, 1 otherwise
