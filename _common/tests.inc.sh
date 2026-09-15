@@ -5,6 +5,14 @@
 # Shared test functions for PHP lint, unit test, and general broken link checks
 #
 
+# Windows needs extra leading slash for path to avoid prepending the host's base
+# path
+if [[ $OSTYPE =~ msys|cygwin ]]; then
+  TEST_CONTAINER_ROOT_PATH=//var/www/html
+else
+  TEST_CONTAINER_ROOT_PATH=/var/www/html
+fi
+
 # Record the start time for unit tests for later log review
 function do_test_record_start_time() {
   TEST_START_TIME=$(date -Is -u)
@@ -17,7 +25,7 @@ function do_test_record_start_time() {
 #
 function do_test_unit_tests() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" sh -c "vendor/bin/phpunit --testdox ${builder_extra_params[*]}"
+  docker exec "${CONTAINER}" sh -c "vendor/bin/phpunit --testdox ${builder_extra_params[*]:-}"
 }
 
 # Lint .php files for obvious errors
@@ -48,7 +56,7 @@ function do_test_links() {
     skipParams+=(--skip "^${baseURL}${skip}")
   done
 
-  builder_echo "Testing links; --skip ^(?!${baseURL}) ${skipParams[*]}"
+  echo "Testing links; --skip ^(?!${baseURL}) ${skipParams[*]}"
 
   npx https://github.com/keymanapp/linkinator \
     "${baseURL}${testPath}" \
@@ -85,18 +93,18 @@ function do_test_print_link_report() {
 #
 function do_test_print_container_error_logs() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh report
+  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh report
 }
 
 
 function do_test_links_setup() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh setup
+  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh setup
   docker kill "${CONTAINER}" --signal="USR1"
 }
 
 function do_test_links_cleanup() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" //var/www/html/_common/tests.container.sh cleanup
+  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh cleanup
   docker kill "${CONTAINER}" --signal="USR1"
 }
