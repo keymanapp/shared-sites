@@ -262,9 +262,19 @@ function docker_build_and_start_composer_container() {
 #
 function docker_stop_and_cleanup_composer_container() {
   local COMPOSER_ID=composer-temp
+
+  # Windows needs extra leading slash for path to avoid prepending the host's
+  # base path
+  local CONTAINER_ROOT_PATH
+  if [[ $OSTYPE =~ msys|cygwin ]]; then
+    CONTAINER_ROOT_PATH=//var/www/html
+  else
+    CONTAINER_ROOT_PATH=/var/www/html
+  fi
+
   # copy modified files to mounted volume:
-  docker exec $COMPOSER_ID    cp composer.lock //var/www/html/
-  docker exec $COMPOSER_ID    cp composer.json //var/www/html/
+  docker exec $COMPOSER_ID    cp composer.lock $CONTAINER_ROOT_PATH/
+  docker exec $COMPOSER_ID    cp composer.json $CONTAINER_ROOT_PATH/
   # cleanup
   docker stop $COMPOSER_ID
   docker rmi $COMPOSER_ID
