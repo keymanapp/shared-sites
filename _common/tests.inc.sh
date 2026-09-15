@@ -93,18 +93,17 @@ function do_test_print_link_report() {
 #
 function do_test_print_container_error_logs() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh report
+  docker exec "${CONTAINER}" sh $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh report
 }
-
 
 function do_test_links_setup() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh setup
+  docker exec "${CONTAINER}" sh $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh setup
   docker kill "${CONTAINER}" --signal="USR1"
 }
 
 function do_test_links_cleanup() {
   local CONTAINER="$1"
-  docker exec "${CONTAINER}" $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh cleanup
+  docker exec "${CONTAINER}" sh $TEST_CONTAINER_ROOT_PATH/_common/tests.container.sh cleanup
   docker kill "${CONTAINER}" --signal="USR1"
 }
