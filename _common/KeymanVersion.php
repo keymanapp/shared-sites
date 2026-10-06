@@ -6,9 +6,9 @@
   class KeymanVersion {
     /* These constant values must be updated manually when we do a beta or stable release. */
     public const stable_version_int = 18;
-    public const beta_version_int = 18;
+    public const beta_version_int = 19;
     public const stable_version = '18.0';
-    public const beta_version = '18.0';
+    public const beta_version = '19.0';
 
     public const unicode_version = '16.0';
 
