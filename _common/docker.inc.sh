@@ -182,6 +182,10 @@ function start_docker_container() {
 #
 # Builder options --no-unit-test, --no-lint, --no-link-check are honoured
 #
+# Environment variables DOCKER_NO_UNIT_TEST, DOCKER_NO_LINT, and
+# DOCKER_NO_LINK_CHECK can be additionally set to stop the corresponding parts
+# of the test (e.g. if we don't have phpunit installed for a given site)
+#
 function test_docker_container() {
   local CONTAINER_DESC="$1"
   local CONTAINER_PORT="$2"
@@ -197,17 +201,17 @@ function test_docker_container() {
 
   do_test_record_start_time
 
-  if ! builder_has_option --no-unit-test; then
+  if ! builder_has_option --no-unit-test && [[ -z ${DOCKER_NO_UNIT_TEST+x} ]]; then
     builder_echo blue "---- PHP unit tests"
     do_test_unit_tests "${CONTAINER_DESC}"
   fi
 
-  if ! builder_has_option --no-lint; then
+  if ! builder_has_option --no-lint && [[ -z ${DOCKER_NO_LINT+x} ]]; then
     builder_echo blue "---- Lint PHP files"
     do_test_lint "${CONTAINER_DESC}"
   fi
 
-  if ! builder_has_option --no-link-check; then
+  if ! builder_has_option --no-link-check && [[ -z ${DOCKER_NO_LINK_CHECK+x} ]]; then
     builder_echo blue "---- Testing links"
 
     do_test_links_setup "${CONTAINER_DESC}"
@@ -224,6 +228,35 @@ function test_docker_container() {
   rm tier.txt
   return "$LINK_RESULT"
 }
+
+#
+# Scan container logs (stdout/stderr) for lines with `[php:...`
+#
+function docker_report_php_errors() {
+  local CONTAINER="$1"
+  if docker container logs "$CONTAINER" 2>&1 | grep -q '\[php:'; then
+    builder_echo red 'PHP reported errors or warnings:'
+    docker container logs "$CONTAINER" 2>&1 | grep '\[php:'
+    return 1
+  else
+    builder_echo green 'No PHP errors found'
+    return 0
+  fi
+}
+
+
+# We want to avoid merging a bootstrap version that is not based on a published
+# tag in the shared-sites repo. We will do this with a heuristic based on the
+# normal shape of the tags, which is `v#.#.#`. Any other shape we will assume is
+# a test branch.
+function docker_verify_bootstrap_required_version() {
+  cat resources/.bootstrap-required-version | grep -qP '^v\d+\.\d+\.\d+$' || (
+    echo "::error file=resources/.bootstrap-required-version,line=1,col=1::This branch cannot be merged, because resources/.bootstrap-required-version references \`$(cat resources/.bootstrap-required-version)\`, which does not appear to be a published tag -- is it a test branch?"
+    exit 1
+  )
+}
+
+####################################################################################
 
 _docker_cleanup_test_docker_container() {
   rm -f "$THIS_SCRIPT_PATH/tier.txt"
